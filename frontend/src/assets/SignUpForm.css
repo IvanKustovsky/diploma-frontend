@@ -1,0 +1,110 @@
+/* Загальний стиль сторінки реєстрації */
+.signup-page {
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    font-family: Arial, sans-serif;
+  }
+  
+  .signup-page h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+  }
+  
+  .success-message {
+    color: #4caf50;
+    text-align: center;
+    margin-bottom: 10px;
+  }
+  
+  .error-message {
+    color: #f44336;
+    text-align: center;
+    margin-bottom: 10px;
+  }
+  
+  /* Стиль форми */
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  form input {
+    padding: 10px 15px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    transition: border-color 0.3s;
+  }
+  
+  form input:focus {
+    border-color: #4caf50;
+    outline: none;
+    box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
+  }
+  
+  form button {
+    padding: 10px 15px;
+    font-size: 16px;
+    background-color: #4caf50;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  form button:hover {
+    background-color: #45a049;
+  }
+  
+  form button:active {
+    background-color: #3e8e41;
+  }
+  
+  /* Медіа-запити для мобільних пристроїв */
+  @media (max-width: 600px) {
+    .signup-page {
+      padding: 15px;
+    }
+  
+    form input {
+      font-size: 14px;
+    }
+  
+    form button {
+      font-size: 14px;
+      padding: 8px 10px;
+    }
+  }
+
+.validation-error {
+    color: red;
+    font-size: 0.9em;
+    margin-top: 4px;
+  }
+
+.phone-input {
+  display: flex;
+  align-items: center;
+}
+
+.phone-prefix {
+  padding: 5px 10px;
+  background: #f0f0f0;
+  border: 1px solid #ccc;
+  border-right: none;
+  border-radius: 5px 0 0 5px;
+}
+
+.phone-input input {
+  border: 1px solid #ccc;
+  border-left: none;
+  border-radius: 0 5px 5px 0;
+  padding: 5px;
+}

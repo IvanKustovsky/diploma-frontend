@@ -1,11 +1,16 @@
-import './assets/App.css';
+import React from "react";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import HomePage from "./pages/Home/HomePage";
+import SignUp from "./pages/SignUp/SignUp";
 
 function App() {
   return (
-      <div>
-          <h1>Welcome to Energy Equipment Rent Application</h1>
-          {/* Add your components here */}
-      </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/signup" element={<SignUp />} />
+      </Routes>
+    </Router>
   );
 }
 

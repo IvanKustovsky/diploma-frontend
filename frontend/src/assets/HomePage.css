@@ -1,0 +1,55 @@
+.home-page {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+  
+  .main-content {
+    flex: 1;
+    padding: 20px;
+  }
+  
+  .hero-section {
+    text-align: center;
+    padding: 40px;
+    background-color: #f4f4f4;
+  }
+  
+  .hero-section h2 {
+    font-size: 2rem;
+  }
+  
+  .hero-section p {
+    font-size: 1.2rem;
+  }
+  
+  .cta-button {
+    padding: 10px 20px;
+    font-size: 1rem;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .cta-button:hover {
+    background-color: #0056b3;
+  }
+  
+  .features-section {
+    padding: 20px;
+  }
+  
+  .features-section .feature {
+    margin-bottom: 20px;
+  }
+  
+  .features-section h3 {
+    font-size: 1.5rem;
+  }
+  
+  .features-section p {
+    font-size: 1rem;
+  }
+  
