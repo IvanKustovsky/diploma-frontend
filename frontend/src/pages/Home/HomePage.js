@@ -1,12 +1,10 @@
+// HomePage.js
 import React from "react";
 import "../../assets/HomePage.css";
-import Header from "../../components/ui/Header";
-import Footer from "../../components/ui/Footer";
 
 function HomePage() {
     return (
         <div className="home-page">
-            <Header />
             <main className="main-content">
                 <section className="hero-section">
                     <h2>Welcome to Our Platform</h2>
@@ -29,7 +27,6 @@ function HomePage() {
                     </div>
                 </section>
             </main>
-            <Footer />
         </div>
     );
 }

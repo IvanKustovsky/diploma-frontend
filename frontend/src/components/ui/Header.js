@@ -16,9 +16,11 @@ function Header() {
           </ul>
         </nav>
         <div className="header-right">
-          <button className="login-btn">Log In</button>
+          <Link to="/login">
+            <button className="login-btn">Увійти</button>
+          </Link>
           <Link to="/signup">
-            <button className="signup-btn">Sign Up</button>
+            <button className="signup-btn">Зареєструватись</button>
           </Link>
         </div>
       </div>
