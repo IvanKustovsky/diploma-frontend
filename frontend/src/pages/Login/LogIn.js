@@ -1,9 +1,9 @@
-// pages/LogIn.js
 import React, { useState } from "react";
 import { logInUser } from "../../services/api";
 import useForm from "../../hooks/useForm";
 import { InputField, SubmitButton } from "../../components/form";
 import "../../assets/LogInForm.css";
+import { useAuth } from "../../context/AuthContext";
 
 const LogIn = () => {
   const [formData, handleChange] = useForm({
@@ -14,24 +14,25 @@ const LogIn = () => {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
 
+  const { logIn } = useAuth(); // ⬅️ Отримуємо логіку входу з контексту
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     try {
       setError(null);
       setSuccess(false);
-  
+
       const response = await logInUser(formData);
-  
+
       if (response.access_token) {
-        localStorage.setItem("access_token", response.access_token);
+        await logIn(response.access_token); // ⬅️ Замість прямого збереження
         setSuccess(true);
       } else {
-        setError("Щось пішло не так"); // Якщо відповідь є, але неочікувана
+        setError("Щось пішло не так");
       }
     } catch (err) {
       console.log("Помилка в catch:", err);
-      // Перевіряємо, чи є відповідь від сервера і чи це помилка авторизації
       if (err.status === 401 || (err.data && err.data.error === "invalid_grant")) {
         setError("Невірні дані для входу");
       } else {
@@ -55,7 +56,6 @@ const LogIn = () => {
             value={formData.email}
             onChange={handleChange}
           />
-
           <InputField
             label="Пароль"
             name="password"
@@ -63,7 +63,6 @@ const LogIn = () => {
             value={formData.password}
             onChange={handleChange}
           />
-
           <SubmitButton label="Увійти" />
         </form>
       </main>
