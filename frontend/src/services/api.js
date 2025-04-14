@@ -13,7 +13,6 @@ const apiClient = axios.create({
 // ✅ Додаємо access_token до кожного запиту, що не є open-api
 apiClient.interceptors.request.use((config) => {
   const token = getAccessToken();
-  console.log("access_token:", token)
 
   // 🔎 Лог всього запиту
   console.log("➡️ Запит:", {
@@ -48,11 +47,16 @@ apiClient.interceptors.request.use((config) => {
 apiClient.interceptors.response.use(
   (response) => response,
   async (error) => {
+    // Детальне логування помилки
+    console.log("📛 Interceptor error details:", {
+      hasResponse: !!error.response,
+      status: error.response?.status,
+      code: error.code,
+      message: error.message,
+    });
     const originalRequest = error.config;
-
-    if (error.response?.status === 403 && !originalRequest._retry) { // щоб уникнути зациклення
-      console.log("Is error.response?.status === 403 ", error.response?.status === 403);
-      console.log("Is !originalRequest._retry ", !originalRequest._retry);
+    const status = error.response?.status;
+    if ((status === 401 || status === 403) && !originalRequest._retry) { // щоб уникнути зациклення
       originalRequest._retry = true;
 
       try {
@@ -69,7 +73,6 @@ apiClient.interceptors.response.use(
         return Promise.reject(refreshError);
       }
     }
-
     return Promise.reject(error);
   }
 );
@@ -131,5 +134,127 @@ export const refreshToken = async () => {
       throw error.response;
     }
     throw new Error("Не вдалося оновити токен");
+  }
+};
+
+export const fetchAllEquipments = async () => {
+  try {
+    const response = await apiClient.get("/equipments/api/v1/all");
+    return response.data.content; // Повертаємо тільки масив об'єктів обладнання
+  } catch (error) {
+    if (error.response) {
+      throw error.response;
+    }
+    throw new Error("Не вдалося завантажити обладнання");
+  }
+};
+
+export const fetchMyEquipments = async () => {
+  try {
+    const response = await apiClient.get("/equipments/api/v1/my");
+    return response.data.content; // Повертаємо тільки масив об'єктів обладнання
+  } catch (error) {
+    if (error.response) {
+      throw error.response;
+    }
+    throw new Error("Не вдалося завантажити обладнання");
+  }
+};
+
+export const fetchEquipmentById = async (id) => {
+  try {
+    const response = await apiClient.get(`/equipments/api/v1/${id}`);
+    console.log("response from fetchEquipmentById ", response)
+    return response.data;
+  } catch (error) {
+    if (error.response) {
+      throw error.response;
+    }
+    throw new Error("Не вдалося завантажити деталі обладнання");
+  }
+};
+
+export const fetchImageById = async (id) => {
+  try {
+    const response = await apiClient.get(`/equipments/api/v1/images/${id}`, {
+      responseType: "blob", // ⚠️ обов'язково, бо це зображення
+    });
+    return URL.createObjectURL(response.data); // перетворюємо на локальний url
+  } catch (error) {
+    console.error("Помилка завантаження зображення:", error);
+    throw error;
+  }
+};
+
+export const registerEquipment = async (equipmentDto, file) => {
+  try {
+    const formData = new FormData();
+    formData.append("equipmentDto", new Blob([JSON.stringify(equipmentDto)], { type: "application/json" }));
+    if (file) {
+      formData.append("main-image", file);
+    }
+
+    const response = await apiClient.post("/equipments/api/v1/register", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data", // не обов'язково, axios сам поставить, але можна явно
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("Помилка при реєстрації обладнання:", error);
+    throw error;
+  }
+};
+
+export const updateEquipment = async (id, equipmentDto) => {
+  try {
+    const formData = new FormData();
+    formData.append("equipmentDto", new Blob([JSON.stringify(equipmentDto)], { type: "application/json" }));
+
+    const response = await apiClient.put(`/equipments/api/v1/${id}`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error(`Помилка при оновленні обладнання з ID ${id}:`, error);
+    throw error;
+  }
+};
+
+export const uploadMainImage = async (id, file) => {
+  try {
+    const formData = new FormData();
+    formData.append("main-image", file);
+
+    const response = await apiClient.post(`/equipments/api/v1/${id}/images/main`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error(`Помилка при завантаженні основного зображення для обладнання з ID ${id}:`, error);
+    throw error;
+  }
+};
+
+export const uploadAdditionalImages = async (id, files) => {
+  try {
+    const formData = new FormData();
+    files.forEach((file) => formData.append("images", file));
+
+    const response = await apiClient.post(`/equipments/api/v1/${id}/images`, formData,  {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error(`Помилка при завантаженні додаткових зображень для обладнання з ID ${id}:`, error);
+    throw error;
   }
 };
