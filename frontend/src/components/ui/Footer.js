@@ -5,7 +5,7 @@ function Footer() {
   return (
     <footer className="footer">
       <div className="container">
-        <p>&copy; 2024 Energy Equipment Rent Application. All rights reserved.</p>
+        <p>&copy; 2025 Energy Equipment Rent Application. All rights reserved.</p>
         <nav className="footer-nav">
           <ul>
             <li><a href="#privacy">Privacy Policy</a></li>

@@ -1,0 +1,46 @@
+/* ProtectedRoute.css */
+
+.protected-route-container {
+    padding: 20px;
+    text-align: center;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    /* Додамо невеликий відступ зверху, щоб не прилипало до верхнього краю */
+    margin-top: 50px;
+}
+
+.protected-route-container h2 {
+    color: #333; /* Темно-сірий текст */
+    margin-bottom: 25px; /* Збільшимо відступ після заголовка */
+    font-size: 1.8rem; /* Трохи збільшимо розмір заголовка */
+}
+
+.protected-route-container button {
+    padding: 10px 20px;
+    margin: 0 10px; /* Збільшимо відступ між кнопками */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+    /* Явно вкажемо, що кнопки inline-block і займають авто ширину */
+    display: inline-block;
+    width: auto;
+}
+
+.protected-route-container button:first-child {
+    background-color: #007bff; /* Основний синій для "Перейти до входу" */
+    color: white;
+}
+
+.protected-route-container button:first-child:hover {
+    background-color: #0056b3; /* Темніший синій на наведенні */
+}
+
+.protected-route-container button:last-child {
+    background-color: #6c757d; /* Вторинний сірий для "Скасувати" */
+    color: white;
+}
+
+.protected-route-container button:last-child:hover {
+    background-color: #5a6268; /* Темніший сірий на наведенні */
+}

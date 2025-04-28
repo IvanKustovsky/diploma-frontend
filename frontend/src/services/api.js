@@ -30,7 +30,7 @@ apiClient.interceptors.request.use((config) => {
     "/users/api/v1/register",
     "/auth/api/v1/login",
     "/auth/api/v1/refresh",
-    "/equipments/api/v1/all"
+    "/advertisement/api/v1/approved"
   ];
 
   const url = config.url?.replace(apiClient.defaults.baseURL, "") || "";
@@ -56,9 +56,10 @@ apiClient.interceptors.response.use(
     });
     const originalRequest = error.config;
     const status = error.response?.status;
-    if ((status === 401 || status === 403) && !originalRequest._retry) { // щоб уникнути зациклення
-      originalRequest._retry = true;
+    const isLoginRequest = originalRequest.url?.includes("/auth/api/v1/login"); // Пропускаємо refresh для login запиту
 
+    if ((status === 401) && !isLoginRequest && !originalRequest.retry) { // щоб уникнути зациклення
+      originalRequest._retry = true;
       try {
         const response = await refreshToken(); // Отримуємо новий access_token
         const newToken = response.access_token;
@@ -82,6 +83,19 @@ export default apiClient;
 export const registerUser = async (userData) => {
   try {
     const response = await apiClient.post("/users/api/v1/register", userData);
+    return response.data; // Успішна відповідь
+  } catch (error) {
+    // Передаємо всю інформацію про помилки
+    if (error.response) {
+      throw error.response; // Кидаємо всю відповідь з сервера
+    }
+    throw new Error("Щось пішло не так"); // Загальна помилка
+  }
+};
+
+export const fetchUserInfoById = async (id) => {
+  try {
+    const response = await apiClient.get(`/users/api/v1/${id}`, id);
     return response.data; // Успішна відповідь
   } catch (error) {
     // Передаємо всю інформацію про помилки
@@ -137,10 +151,68 @@ export const refreshToken = async () => {
   }
 };
 
-export const fetchAllEquipments = async () => {
+export const fetchPendingAdvertisements = async () => {
   try {
-    const response = await apiClient.get("/equipments/api/v1/all");
-    return response.data.content; // Повертаємо тільки масив об'єктів обладнання
+    const response = await apiClient.get("/advertisement/api/v1/pending"); // TODO change endpoint to advertisement
+    return response.data.content;  // TODO Check if only "content" actually needed
+  } catch (error) {
+    if (error.response) {
+      throw error.response;
+    }
+    throw new Error("Не вдалося завантажити обладнання");
+  }
+};
+
+export const fetchApprovedAdvertisements = async (page = 0, size = 2) => {
+  try {
+    // Додаємо параметри page та size до URL
+    const response = await apiClient.get("/advertisement/api/v1/approved", {
+      params: {
+        page: page, // номер сторінки (0-based index)
+        size: size, // кількість елементів на сторінці
+      },
+    });
+    // Повертаємо весь об'єкт Page, отриманий від бекенду
+    return response.data;
+  } catch (error) {
+    console.error("Помилка завантаження затверджених оголошень:", error);
+    if (error.response) {
+      // Якщо є відповідь з помилкою від сервера
+      throw error.response;
+    }
+    // Якщо сталася інша помилка (наприклад, мережева)
+    throw new Error("Не вдалося завантажити обладнання");
+  }
+};
+
+export const fetchApprovedAdvertisementsByUserId = async (userId) => {
+  try {
+    const response = await apiClient.get(`/advertisement/api/v1/approved/user/${userId}`); // TODO change endpoint to advertisement
+    return response.data.content;  // TODO Check if only "content" actually needed
+  } catch (error) {
+    if (error.response) {
+      throw error.response;
+    }
+    throw new Error("Не вдалося завантажити обладнання");
+  }
+};
+
+export const approveAdvertisement = async (id, payload) => {
+  try {
+    const response = await apiClient.post(`/advertisement/api/v1/${id}/approve`, payload); // TODO change endpoint to advertisement
+    return response.data;
+  } catch (error) {
+    if (error.response) {
+      throw error.response;
+    }
+    throw new Error("Не вдалося завантажити обладнання");
+  }
+};
+
+export const rejectAdvertisement = async (id, payload) => {
+  try {
+    const response = await apiClient.post(`/advertisement/api/v1/${id}/reject`, payload); // TODO change endpoint to advertisement
+    return response.data;
   } catch (error) {
     if (error.response) {
       throw error.response;
@@ -158,6 +230,18 @@ export const fetchMyEquipments = async () => {
       throw error.response;
     }
     throw new Error("Не вдалося завантажити обладнання");
+  }
+};
+
+export const getCategoriesWithSubcategories = async () => {
+  try {
+    const response = await apiClient.get("/equipments/api/v1/categories-with-subcategories");
+    return response.data;
+  } catch (error) {
+    if (error.response) {
+      throw error.response;
+    }
+    throw new Error("Не вдалося завантажити категорії та підкатегорії");
   }
 };
 
@@ -246,7 +330,7 @@ export const uploadAdditionalImages = async (id, files) => {
     const formData = new FormData();
     files.forEach((file) => formData.append("images", file));
 
-    const response = await apiClient.post(`/equipments/api/v1/${id}/images`, formData,  {
+    const response = await apiClient.post(`/equipments/api/v1/${id}/images`, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },

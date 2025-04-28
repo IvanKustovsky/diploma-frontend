@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { fetchEquipmentById, fetchImageById } from "../../services/api";
 import "../../assets/EquipmentDetailsPage.css";
+import { categoryTranslations, subcategoryTranslations } from '../../data/translations';
 
 const EquipmentDetailsPage = () => {
   const { id } = useParams();
@@ -80,14 +81,18 @@ const EquipmentDetailsPage = () => {
 
       <div className="info">
         <p><strong>Опис:</strong> {equipment.description}</p>
-        <p><strong>Категорія:</strong> {equipment.category}</p>
+        <p><strong>Категорія:</strong> {categoryTranslations[equipment.category] || equipment.category}</p>
+        <p><strong>Підкатегорія: </strong>
+          {subcategoryTranslations[equipment.subcategory] || equipment.subcategory}</p>
         <p><strong>Стан:</strong> {
           equipment.condition === "NEW" ? "Новий" :
-          equipment.condition === "USED" ? "Вживаний" :
-          "Відновлений"
+            equipment.condition === "USED" ? "Вживаний" :
+              "Відновлений"
         }</p>
         <p><strong>Ціна:</strong> {equipment.price} грн</p>
-        <p><strong>Користувач (ID):</strong> {equipment.userId}</p>
+        <Link to="/user-profile" state={{ userId: equipment.userId }}>
+          👤 Переглянути профіль
+        </Link>
       </div>
 
       <Link className="back-link" to="/equipments">⬅️ Назад до списку</Link>

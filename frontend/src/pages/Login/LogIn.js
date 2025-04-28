@@ -1,11 +1,17 @@
 import React, { useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { logInUser } from "../../services/api";
 import useForm from "../../hooks/useForm";
 import { InputField, SubmitButton } from "../../components/form";
 import "../../assets/LogInForm.css";
 import { useAuth } from "../../context/AuthContext";
+import { validateLogin } from "../../utils/validation";
 
 const LogIn = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from?.pathname || "/";
+
   const [formData, handleChange] = useForm({
     email: "",
     password: "",
@@ -13,21 +19,31 @@ const LogIn = () => {
 
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
+  const [validationErrors, setValidationErrors] = useState({});
 
-  const { logIn } = useAuth(); // ⬅️ Отримуємо логіку входу з контексту
+  const { logIn } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    const errors = validateLogin(formData);
+    if (Object.keys(errors).length > 0) {
+      setValidationErrors(errors);
+      return;
+    }
+
     try {
       setError(null);
       setSuccess(false);
+      setValidationErrors({});
 
       const response = await logInUser(formData);
 
       if (response.access_token) {
-        await logIn(response.access_token); // ⬅️ Замість прямого збереження
+        await logIn(response.access_token);
         setSuccess(true);
+        console.log(from)
+        navigate(from, { replace: true });
       } else {
         setError("Щось пішло не так");
       }
@@ -52,9 +68,10 @@ const LogIn = () => {
             label="Email"
             name="email"
             type="email"
-            placeholder={"Введіть email"}
+            placeholder="Введіть email"
             value={formData.email}
             onChange={handleChange}
+            error={validationErrors.email}
           />
           <InputField
             label="Пароль"
@@ -62,6 +79,7 @@ const LogIn = () => {
             type="password"
             value={formData.password}
             onChange={handleChange}
+            error={validationErrors.password}
           />
           <SubmitButton label="Увійти" />
         </form>

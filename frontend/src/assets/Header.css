@@ -1,22 +1,45 @@
+/* src/assets/Header.css */
+
 .header {
-  background-color: #282c34;
+  /* Використовуємо темніший синій відтінок з градієнту головної сторінки */
+  background-color: #2a5298;
   color: white;
+  /* Колір тексту посилань за замовчуванням */
   padding: 15px 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  /* Додаємо легку тінь */
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  /* Використовуємо той же шрифт */
 }
 
 .container {
   display: flex;
   align-items: center;
+  /* Використовуємо максимальну ширину, як на головній сторінці, якщо потрібно центрувати */
+  /* max-width: 1200px; */
+  /* margin: 0 auto; */
   width: 100%;
+  /* Або залиште 100%, якщо не потрібне центрування */
 }
 
+/* Стиль логотипу/назви сайту */
 .header-title {
   margin: 0;
   font-size: 1.8rem;
   margin-right: 20px;
+  text-decoration: none;
+  color: white;
+  /* Назва сайту білого кольору */
+  font-weight: bold;
+  transition: color 0.3s ease;
+}
+
+.header-title:hover {
+  color: #eef4f8;
+  /* Трохи світліший на наведенні */
 }
 
 .header-nav ul {
@@ -27,47 +50,165 @@
 }
 
 .header-nav li {
-  margin-right: 15px;
+  margin-right: 20px;
+  /* Збільшимо відступ між пунктами меню */
 }
 
 .header-nav a {
   color: white;
+  /* Колір посилань меню - білий */
   text-decoration: none;
   font-size: 1rem;
+  position: relative;
+  /* Для ефекту підкреслення */
+  transition: color 0.3s ease;
 }
 
-.header-nav a:hover {
-  text-decoration: underline;
+/* Ефект підкреслення при наведенні для посилань меню */
+.header-nav a::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: -5px;
+  /* Розташування під текстом */
+  left: 0;
+  background-color: white;
+  /* Колір підкреслення */
+  transition: width 0.3s ease-in-out;
 }
+
+.header-nav a:hover::after {
+  width: 100%;
+  /* Розтягуємо підкреслення при наведенні */
+}
+
 
 .header-right {
   display: flex;
   align-items: center;
   margin-left: auto;
+  /* Виштовхує правий блок в кінець контейнера */
 }
 
-.login-btn, .signup-btn {
-  background-color: #4CAF50; /* Green */
-  border: none;
-  color: white;
+/* Базові стилі для всіх кнопок у хедері */
+.header-right button {
   padding: 10px 20px;
-  margin-left: 5px;
-  text-align: center;
+  margin-left: 10px;
+  /* Відступ між кнопками */
+  border: none;
+  border-radius: 20px;
+  /* Більш округлі кнопки, як CTA на головній */
   font-size: 1rem;
   cursor: pointer;
-  border-radius: 5px;
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  font-weight: 600;
+  /* Трохи жирніший текст */
 }
 
-.login-btn {
+/* Стиль кнопки "Увійти" та "Вийти" (вторинна дія) */
+.login-btn,
+.logout-btn {
+  /* Стиль схожий на обведений CTA або сіру кнопку з ProtectedRoute */
+  /* Варіант 1: Обведений синім */
   background-color: transparent;
   color: white;
+  /* Колір тексту білий на темному фоні */
   border: 1px solid white;
+  /* Біла рамка */
 }
 
+.login-btn:hover,
+.logout-btn:hover {
+  /* Варіант 1: Фон синій, текст білий */
+  background-color: #4a90e2;
+  /* Основний синій */
+  border-color: #4a90e2;
+  color: white;
+}
+
+/* Стиль кнопки "Зареєструватись" (основна CTA) */
 .signup-btn {
-  background-color: #4CAF50;
+  /* Стиль схожий на CTA кнопку з головної сторінки */
+  background-color: #ffffff;
+  /* Білий фон */
+  color: #2a5298;
+  /* Колір тексту - темний синій */
+  border: 1px solid #ffffff;
+  /* Біла рамка, щоб не "стрибало" при наведенні */
 }
 
-.signup-btn:hover, .login-btn:hover {
-  background-color: #45a049;
+.signup-btn:hover {
+  background-color: #f0f0f0;
+  /* Легкий сірий на наведенні */
+  border-color: #f0f0f0;
+}
+
+
+/* Адаптивність для мобільних пристроїв */
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    /* Елементи стекуються вертикально */
+    align-items: flex-start;
+    /* Вирівнювання зліва */
+    padding: 10px 15px;
+  }
+
+  .container {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .header-title {
+    font-size: 1.5rem;
+    margin-right: 0;
+    margin-bottom: 10px;
+    /* Відступ під заголовком */
+  }
+
+  .header-nav {
+    margin-bottom: 10px;
+    /* Відступ під меню */
+  }
+
+  .header-nav ul {
+    flex-direction: column;
+    /* Пункти меню один під одним */
+  }
+
+  .header-nav li {
+    margin-right: 0;
+    margin-bottom: 5px;
+    /* Відступ між пунктами меню */
+  }
+
+  .header-nav a::after {
+    bottom: 0;
+    /* Коригуємо положення підкреслення */
+  }
+
+
+  .header-right {
+    margin-left: 0;
+    /* Вирівнювання зліва */
+    width: 100%;
+    /* Займає всю ширину */
+    justify-content: flex-start;
+    /* Кнопки вирівнюються зліва */
+    margin-top: 10px;
+    /* Відступ зверху */
+  }
+
+  .header-right button {
+    margin-left: 0;
+    /* Прибираємо відступ зліва */
+    margin-right: 10px;
+    /* Додаємо відступ справа між кнопками */
+  }
+
+  .header-right button:last-child {
+    margin-right: 0;
+    /* Прибираємо відступ справа для останньої кнопки */
+  }
 }

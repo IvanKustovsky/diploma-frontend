@@ -3,7 +3,7 @@ import React from "react";
 const CompanyCodeInput = ({ value, onChange, error }) => {
   return (
     <div className="input-field mb-4">
-      <label className="block mb-1 font-medium">Код компанії</label>
+      <label className="block mb-1 font-medium">Код компанії (ЄДРПОУ)</label>
       <input
         type="text"
         value={value}

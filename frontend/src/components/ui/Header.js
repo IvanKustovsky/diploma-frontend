@@ -4,12 +4,15 @@ import { useAuth } from "../../context/AuthContext";
 import "../../assets/Header.css";
 
 function Header() {
-  const { isAuthenticated, logOut } = useAuth();
+  const { isAuthenticated, roles, logOut } = useAuth();
+  const isAdmin = roles.includes("ADMIN");
 
   return (
     <header className="header">
       <div className="container">
-        <h1 className="header-title">E2Rent</h1>
+        <Link to="/">
+          <h1 className="header-title">E2Rent</h1>
+        </Link>
         <nav className="header-nav">
           <ul>
             <li>
@@ -18,6 +21,11 @@ function Header() {
             {isAuthenticated && (
               <li>
                 <Link to="/my-equipments">Мої оголошення</Link>
+              </li>
+            )}
+            {isAuthenticated && isAdmin && (
+              <li>
+                <Link to="/moderation">Модерація</Link>
               </li>
             )}
           </ul>
