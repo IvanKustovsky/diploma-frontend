@@ -23,9 +23,9 @@
 /* Додаємо стилі для помилок, якщо хочете змінити більше параметрів */
 .text-error {
   color: red;
-  font-size: 0.875rem; /* Малий шрифт для помилок */
-  margin-top: 5px; /* Відступ для відокремлення помилок від поля */
-  font-weight: bold; /* Можна зробити текст жирним */
+  font-size: 0.875rem;
+  margin-top: 5px;
+  font-weight: bold;
 }
 
 .success-message {
@@ -48,7 +48,7 @@ form {
 }
 
 form input {
-  width: 100%; /* Поля займають всю ширину контейнера */
+  width: 100%;
   padding: 10px 15px;
   font-size: 16px;
   border: 1px solid #ccc;
@@ -63,7 +63,7 @@ form input:focus {
 }
 
 form button {
-  width: 100%; /* Кнопка займає всю ширину */
+  width: 100%;
   padding: 10px 15px;
   font-size: 16px;
   background-color: #4caf50;
@@ -84,7 +84,7 @@ form button:active {
 
 /* Стилі для PhoneInput */
 .phone-input-container {
-  margin-bottom: 15px; /* Відступ знизу для вирівнювання з іншими полями */
+  margin-bottom: 15px;
 }
 
 /* Група для префікса і поля введення */
@@ -93,7 +93,7 @@ form button:active {
   flex-direction: row;
   align-items: center;
   gap: 0;
-  width: 100%; /* Група займає всю ширину */
+  width: 100%;
 }
 
 /* Стилі для префікса */
@@ -105,12 +105,12 @@ form button:active {
   border-radius: 5px 0 0 5px;
   font-size: 16px;
   line-height: 1;
-  white-space: nowrap; /* Запобігає перенесенню тексту */
+  white-space: nowrap;
 }
 
 /* Стилі для поля введення телефону */
 .phone-input-group input {
-  flex: 1; /* Поле займає всю доступну ширину */
+  flex: 1;
   border: 1px solid #ccc;
   border-left: none;
   border-radius: 0 5px 5px 0;
@@ -120,22 +120,22 @@ form button:active {
 
 /* Стилі для кастомного checkbox */
 .custom-checkbox {
-  width: 20px; /* Збільшуємо ширину чекбокса */
-  height: 20px; /* Збільшуємо висоту чекбокса */
-  margin-left: 10px; /* Відступ між чекбоксом та текстом */
-  cursor: pointer; /* Додаємо вказівник курсору */
+  width: 20px;
+  height: 20px;
+  margin-left: 10px;
+  cursor: pointer;
 }
 
 /* Виправлення вирівнювання для label */
 .checkbox-field {
   display: flex;
-  align-items: center; /* Вирівнює чекбокс і текст по вертикалі */
+  align-items: center;
 }
 
 .checkbox-field label {
   display: flex;
-  flex-direction: row-reverse; /* Переміщаємо чекбокс праворуч від тексту */
-  align-items: center; /* Вирівнює чекбокс по вертикалі з текстом */
+  flex-direction: row-reverse;
+  align-items: center;
 }
 
 /* Виправлення для помилок валідації */
@@ -143,35 +143,4 @@ form button:active {
   color: red;
   font-size: 0.9em;
   margin-top: 4px;
-}
-
-/* Медіа-запити для мобільних пристроїв */
-@media (max-width: 600px) {
-  .signup-page {
-    padding: 15px;
-  }
-
-  form input {
-    font-size: 14px;
-  }
-
-  form button {
-    font-size: 14px;
-    padding: 8px 10px;
-  }
-
-  .phone-prefix {
-    padding: 8px 10px;
-    font-size: 14px;
-  }
-
-  .phone-input-group input {
-    padding: 8px 10px;
-    font-size: 14px;
-  }
-
-  .custom-checkbox {
-    transform: scale(1.3); /* Опціонально: адаптація для мобільних */
-    margin-right: 8px;
-  }
 }

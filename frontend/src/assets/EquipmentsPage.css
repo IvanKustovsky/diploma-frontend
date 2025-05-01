@@ -5,10 +5,8 @@
   width: 100%;
   max-width: 100%;
   margin: 0 auto;
-  /* Центрує контейнер, якщо є max-width */
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   box-sizing: border-box;
-  /* Включає padding у загальну ширину/висоту */
 }
 
 .equipments-page h2 {
@@ -27,7 +25,6 @@
 
 .error {
   color: #e74c3c;
-  /* Трохи м'якший червоний */
   text-align: center;
   margin-bottom: 1rem;
   font-weight: bold;
@@ -41,128 +38,91 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: 1.5rem;
-  /* width: 100%; - Зайве */
 }
 
 .equipment-card {
   background-color: #ffffff;
-  /* Чистий білий фон */
   border-radius: 12px;
-  /* Трохи менший радіус */
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-  /* Більш виражена тінь */
   padding: 1.2rem;
-  /* Більший внутрішній відступ */
   text-align: center;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
-  /* Додано transition для тіні */
   display: flex;
-  /* Для кращого вирівнювання вмісту */
   flex-direction: column;
-  /* Вміст у стовпчик */
   justify-content: space-between;
-  /* Розтягує вміст */
 }
 
 .equipment-card:hover {
   transform: translateY(-5px);
-  /* Трохи більший підйом */
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
-  /* Збільшена тінь при наведенні */
 }
 
 .equipment-card h3 {
   font-size: 1.3rem;
-  /* Трохи більший заголовок */
   color: #34495e;
   margin-top: 0;
-  /* Забираємо верхній відступ */
   margin-bottom: 1rem;
   min-height: 2.6rem;
-  /* Щоб картки не стрибали по висоті через різну довжину назв (2 рядки) */
   overflow: hidden;
-  /* Ховає текст, якщо він задовгий */
 }
 
 .equipment-card img {
   width: 100%;
-  /* Заповнює ширину картки */
   height: 200px;
-  /* Фіксована висота */
   object-fit: contain;
-  /* Зображення вміщується повністю, зберігаючи пропорції */
   border-radius: 8px;
-  /* Менший радіус для зображення */
   margin-bottom: 1rem;
   background-color: #f0f0f0;
-  /* Світлий фон на випадок прозорих PNG */
 }
 
 /* Стилі для плейсхолдера зображення */
 .image-placeholder {
   width: 100%;
-  /* Займає доступну ширину */
   height: 200px;
-  /* Така ж висота, як у img */
   background-color: #eeeeee;
   display: flex;
   align-items: center;
   justify-content: center;
   color: #888888;
   font-size: 0.9rem;
-  /* Зменшено розмір шрифту */
   border-radius: 8px;
-  /* Такий же радіус, як у img */
   margin-bottom: 1rem;
   text-align: center;
   padding: 0.5rem;
-  /* Додано невеликий відступ */
   box-sizing: border-box;
 }
 
 
 .equipment-card p {
   margin: 0.5rem 0;
-  /* Невеликі відступи зверху/знизу */
   font-size: 1rem;
   color: #555;
 }
 
 .equipment-card p strong {
   color: #333;
-  /* Темніший колір для ціни */
 }
-
 
 .equipment-card a {
   display: inline-block;
   margin-top: 1rem;
-  /* Відступ зверху від ціни */
   padding: 0.6rem 1.2rem;
-  /* Збільшено паддінги */
   text-decoration: none;
   color: #ffffff;
-  /* Білий текст */
   background-color: #3498db;
-  /* Синій фон */
   font-weight: 500;
   border-radius: 6px;
-  /* Закруглені кути */
   transition: background-color 0.2s ease, transform 0.1s ease;
-  /* Плавні переходи */
 }
 
 .equipment-card a:hover {
   background-color: #2980b9;
-  /* Темніший синій при наведенні */
   color: #ffffff;
   transform: scale(1.03);
-  /* Невелике збільшення */
 }
 
 .equipment-card a:active {
   transform: scale(0.98);
-  /* Невелике зменшення при кліку */
 }
 
 /* Стиль для повідомлення про відсутність елементів */
@@ -171,46 +131,90 @@
   font-size: 1.1rem;
   color: #666;
   padding: 3rem 2rem;
-  /* Збільшені відступи */
   border: 1px dashed #cccccc;
-  /* Світліша рамка */
   border-radius: 10px;
   background-color: #f9f9f9;
   margin-top: 2rem;
+}
+
+.equipment-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.equipment-actions a,
+.equipment-actions .action-link {
+  flex: 1 1 auto;
+  min-width: 120px;
+  text-align: center;
+}
+
+.action-link {
+  display: inline-block;
+  padding: 0.6rem 1.2rem;
+  background-color: #e67e22;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+  text-decoration: none;
+}
+
+.action-link:hover {
+  background-color: #d35400;
+  transform: scale(1.03);
+}
+
+.action-link:active {
+  transform: scale(0.98);
+}
+
+.upload-link.prominent {
+  display: inline-block;
+  margin: 0 auto 2rem auto;
+  padding: 0.8rem 1.6rem;
+  font-size: 1.1rem;
+  background-color: #27ae60;
+  color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3);
+  font-weight: bold;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+  text-decoration: none;
+}
+
+.upload-link.prominent:hover {
+  background-color: #219150;
+  transform: translateY(-2px);
+}
+
+.upload-link.prominent:active {
+  transform: translateY(0);
 }
 
 /* Стилі для пагінації */
 .pagination-controls {
   display: flex;
   flex-direction: column;
-  /* Розташовує дочірні елементи в ряд */
   justify-content: center;
-  /* Центрує елементи по горизонталі, якщо є вільний простір */
   align-items: center;
-  /* Вирівнює елементи по вертикалі */
   flex-wrap: wrap;
-  /* Дозволяє переносити елементи на новий рядок, якщо не вміщаються */
   gap: 0.8rem;
-  /* Проміжок між елементами */
-
-  /* --- Зміни для центрування блоку та запобігання розтягуванню --- */
   width: fit-content;
-  /* Ширина блоку адаптується до вмісту */
   max-width: 100%;
-  /* Запобігає виходу за межі екрану на дуже малих пристроях */
   margin: 2.5rem auto 0 auto;
-  /* Верхній відступ + автоматичні бічні відступи для центрування блоку */
-  /* --- Кінець змін --- */
 
   padding: 1rem;
   background-color: #f8f9fa;
   border-radius: 8px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
   box-sizing: border-box;
-  /* Включаємо padding у розрахунок ширини */
 }
 
-/* Стилі для кнопок, тексту сторінки та селектора залишаються ті ж самі */
 .pagination-controls button {
   padding: 0.6rem 1.2rem;
   background-color: #3498db;
@@ -221,7 +225,6 @@
   transition: background-color 0.2s ease, transform 0.1s ease;
   font-size: 0.95rem;
   white-space: nowrap;
-  /* Щоб текст кнопки не переносився */
 }
 
 .pagination-controls button:disabled {
@@ -229,7 +232,6 @@
   cursor: not-allowed;
   opacity: 0.7;
   transform: none;
-  /* Забираємо ефект підйому для неактивної кнопки */
 }
 
 .pagination-controls button:hover:not(:disabled) {
@@ -241,10 +243,8 @@
   transform: translateY(0px);
 }
 
-/* Стилі для контейнера вибору розміру сторінки */
 .page-size-selector {
   display: flex;
-  /* Залишаємо flex для label та select */
   align-items: center;
   gap: 0.5rem;
 }
@@ -253,7 +253,6 @@
   font-size: 0.95rem;
   color: #34495e;
   white-space: nowrap;
-  /* Запобігаємо переносу тексту мітки */
 }
 
 .pagination-controls select {
@@ -276,94 +275,4 @@
   color: #34495e;
   margin: 0 0.5rem;
   white-space: nowrap;
-}
-
-/* Адаптивні стилі - тепер без flex-direction: column */
-@media (max-width: 768px) {
-
-  /* flex-wrap: wrap; вже є в основному стилі, тому на менших екранах
-     елементи автоматично перенесуться на наступний рядок,
-     але залишатимуться в межах центрованого блоку */
-  .pagination-controls {
-    gap: 0.6rem;
-    /* Можна трохи зменшити проміжок */
-    padding: 0.8rem;
-  }
-}
-
-@media (max-width: 480px) {
-
-  .pagination-controls button,
-  .pagination-controls select,
-  .pagination-controls span,
-  .page-size-selector label {
-    font-size: 0.9rem;
-    /* Менший шрифт */
-  }
-
-  .pagination-controls {
-    gap: 0.5rem;
-    padding: 0.6rem;
-  }
-}
-
-/* Адаптивні стилі */
-@media (max-width: 768px) {
-  .equipments-page {
-    padding: 1.5rem;
-  }
-
-  .equipment-list {
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    /* Трохи менша мін. ширина картки */
-  }
-
-  .equipments-page h2 {
-    font-size: 2rem;
-  }
-
-  .pagination-controls {
-    flex-direction: column;
-    /* Складаємо елементи пагінації в стовпчик */
-    gap: 1rem;
-    /* Збільшуємо відступ у стовпчику */
-  }
-}
-
-@media (max-width: 480px) {
-  .equipments-page {
-    padding: 1rem;
-  }
-
-  .equipment-card {
-    padding: 1rem;
-    /* Трохи менший відступ */
-  }
-
-  .equipment-card h3 {
-    font-size: 1.1rem;
-  }
-
-  .equipment-card img,
-  .image-placeholder {
-    height: 160px;
-    /* Зменшуємо висоту зображення/плейсхолдера */
-  }
-
-  .equipment-card a {
-    padding: 0.5rem 1rem;
-    font-size: 0.9rem;
-  }
-
-  .pagination-controls button,
-  .pagination-controls select,
-  .pagination-controls span,
-  .page-size-selector label {
-    font-size: 0.9rem;
-    /* Менший шрифт для пагінації */
-  }
-
-  .pagination-controls {
-    padding: 0.8rem;
-  }
 }

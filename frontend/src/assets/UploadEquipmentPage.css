@@ -76,15 +76,3 @@
   .upload-equipment-page button[type="submit"]:hover {
     background-color: #1e8449;
   }
-  
-  /* Адаптивність для мобільних */
-  @media (max-width: 480px) {
-    .upload-equipment-page {
-      padding: 1rem;
-    }
-  
-    .upload-equipment-page h2 {
-      font-size: 1.6rem;
-    }
-  }
-  

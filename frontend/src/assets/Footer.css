@@ -1,15 +1,12 @@
-/* src/assets/Footer.css - ВИПРАВЛЕНА ВЕРСІЯ 2 */
+/* src/assets/Footer.css */
 
 .footer {
   background-color: #2a5298;
-  /* Темний синій */
   color: white;
   padding: 25px 20px;
-  /* Трохи зменшимо верхній/нижній відступ порівняно з попередньою версією */
   text-align: center;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   margin-top: auto;
-  /* Відштовхує футер до низу */
 }
 
 .footer .container {
@@ -28,9 +25,7 @@
 
 .footer-nav {
   margin-top: 15px;
-  /* Трохи зменшимо відступ */
   margin-bottom: 0;
-  /* Приберемо нижній відступ тут, він буде контролюватися gap */
 }
 
 .footer-nav ul {
@@ -39,15 +34,11 @@
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
-  /* ВИКОРИСТОВУЄМО GAP ДЛЯ ВІДСТУПІВ МІЖ ЕЛЕМЕНТАМИ */
   gap: 8px 15px;
-  /* Вертикальний gap 8px, Горизонтальний gap 15px */
   margin: 0;
-  /* Приберемо будь-які стандартні марджини у ul */
 }
 
 .footer-nav li {
-  /* Прибираємо марджини, оскільки gap їх замінює */
   margin: 0;
 }
 
@@ -60,16 +51,5 @@
 
 .footer-nav a:hover {
   color: #eef4f8;
-  /* Світліший відтінок при наведенні */
   text-decoration: none;
 }
-
-/* Медіа-запит може вже не знадобитись для li, оскільки gap працює автоматично */
-/* Якщо потрібні інші корегування на мобільних, можна додати їх тут */
-/*
-@media (max-width: 600px) {
-    .footer-nav ul {
-        gap: 5px 10px; // Можливо, менші відступи на мобільних
-    }
-}
-*/

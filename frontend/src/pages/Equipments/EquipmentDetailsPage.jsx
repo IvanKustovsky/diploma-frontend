@@ -94,6 +94,9 @@ const EquipmentDetailsPage = () => {
           👤 Переглянути профіль
         </Link>
       </div>
+      <Link to="/equipment/rent" state={{ equipmentId: equipment.id }} className="rent-button">
+        📝 Оформити оренду
+      </Link>
 
       <Link className="back-link" to="/equipments">⬅️ Назад до списку</Link>
     </div>

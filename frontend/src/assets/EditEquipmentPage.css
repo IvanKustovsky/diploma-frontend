@@ -100,14 +100,3 @@
   height: 100px;
   object-fit: cover;
 }
-
-/* Responsive */
-@media (max-width: 500px) {
-  .edit-equipment-page {
-    padding: 1rem;
-  }
-
-  .edit-equipment-page button {
-    width: 100%;
-  }
-}

@@ -1,73 +1,56 @@
 /* src/assets/UserDetailsPage.css */
 
 .user-details-page {
-    max-width: 800px; /* Обмежимо ширину для кращої читабельності */
-    margin: 2rem auto; /* Центруємо блок на сторінці і додаємо відступи зверху/знизу */
-    padding: 2rem; /* Внутрішні відступи */
-    background-color: #ffffff; /* Білий фон */
-    border-radius: 12px; /* Округлені кути */
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* Легка тінь */
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Шрифт */
-    color: #333; /* Основний колір тексту */
-  }
-  
-  .user-details-page h2 {
-    text-align: center; /* Заголовок по центру */
-    font-size: 2rem; /* Розмір заголовка */
-    color: #2c3e50; /* Колір заголовка */
-    margin-bottom: 1.5rem; /* Відступ знизу */
-  }
-  
-  .user-details-page h3 {
-    font-size: 1.5rem; /* Розмір підзаголовка */
-    color: #34495e; /* Колір підзаголовка */
-    margin-top: 2rem; /* Відступ зверху (перед секцією компанії) */
-    margin-bottom: 1rem; /* Відступ знизу */
-    border-bottom: 1px solid #ecf0f1; /* Лінія-роздільник */
-    padding-bottom: 0.5rem; /* Відступ під лінією */
-  }
-  
-  .user-info-section,
-  .company-info-section {
-    margin-bottom: 1rem; /* Відступ між секціями */
-  }
-  
-  .user-info-section p,
-  .company-info-section p {
-    font-size: 1rem; /* Розмір тексту */
-    line-height: 1.6; /* Міжрядковий інтервал */
-    margin-bottom: 0.75rem; /* Відступ між параграфами */
-    color: #555; /* Колір тексту інформації */
-  }
-  
-  /* Стиль для "лейблів" (наприклад, "Ім’я:") */
-  .info-label {
-    font-weight: 600; /* Жирний шрифт */
-    color: #333; /* Темніший колір для лейблів */
-    margin-right: 8px; /* Невеликий відступ справа від лейбла */
-  }
-  
-  /* Стиль для повідомлення про завантаження */
-  .loading-message {
-    font-size: 1.2rem;
-    text-align: center;
-    padding: 3rem;
-    color: #7f8c8d;
-    font-style: italic;
-  }
-  
-  /* Адаптивність для менших екранів */
-  @media (max-width: 600px) {
-    .user-details-page {
-      margin: 1rem;
-      padding: 1.5rem;
-    }
-  
-    .user-details-page h2 {
-      font-size: 1.8rem;
-    }
-  
-    .user-details-page h3 {
-      font-size: 1.3rem;
-    }
-  }
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #333;
+}
+
+.user-details-page h2 {
+  text-align: center;
+  font-size: 2rem;
+  color: #2c3e50;
+  margin-bottom: 1.5rem;
+}
+
+.user-details-page h3 {
+  font-size: 1.5rem;
+  color: #34495e;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid #ecf0f1;
+  padding-bottom: 0.5rem;
+}
+
+.user-info-section,
+.company-info-section {
+  margin-bottom: 1rem;
+}
+
+.user-info-section p,
+.company-info-section p {
+  font-size: 1rem;
+  line-height: 1.6;
+  margin-bottom: 0.75rem;
+  color: #555;
+}
+
+.info-label {
+  font-weight: 600;
+  color: #333;
+  margin-right: 8px;
+}
+
+/* Стиль для повідомлення про завантаження */
+.loading-message {
+  font-size: 1.2rem;
+  text-align: center;
+  padding: 3rem;
+  color: #7f8c8d;
+  font-style: italic;
+}

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { fetchMyEquipments, fetchImageById } from "../../services/api";
+import { fetchMyEquipments, fetchImageById, activateEquipment, deactivateEquipment } from "../../services/api";
 import { Link } from "react-router-dom";
 import "../../assets/EquipmentsPage.css";
 
@@ -32,11 +32,39 @@ const MyEquipmentsPage = () => {
     loadMyEquipments();
   }, []);
 
+  const handleToggleStatus = async (equipmentId, status) => {
+    const confirmMessage =
+      status === "AVAILABLE"
+        ? "Ви впевнені, що хочете деактивувати це оголошення?"
+        : "Ви впевнені, що хочете активувати це оголошення?";
+
+    const confirmed = window.confirm(confirmMessage);
+    if (!confirmed) return;
+
+    try {
+      if (status === "AVAILABLE") {
+        await deactivateEquipment(equipmentId);
+      } else if (status === "INACTIVE") {
+        await activateEquipment(equipmentId);
+      }
+
+      const updated = await fetchMyEquipments();
+      setMyEquipments(updated);
+    } catch (err) {
+      console.error("Помилка зміни статусу обладнання:", err);
+      setError("Не вдалося змінити статус.");
+    }
+  };
+
   return (
     <div className="equipments-page">
       <h2>Мої оголошення</h2>
       {error && <p className="error">{error}</p>}
+      <Link to="/equipment/upload" className="upload-link prominent">
+        ➕ Створити нове оголошення
+      </Link>
       <div className="equipment-list">
+
         {myEquipments.map((item) => (
           <div key={item.id} className="equipment-card">
             <h3>{item.name}</h3>
@@ -45,16 +73,22 @@ const MyEquipmentsPage = () => {
             ) : (
               <p>Завантаження зображення...</p>
             )}
-            <div className="actions">
+            <p><strong>Ціна:</strong> {item.price} грн</p>
+            <div className="actions equipment-actions">
               <Link to={`/equipment/${item.id}`}>👁 Переглянути</Link>
               <Link to={`/equipment/${item.id}/edit`}>✏️ Редагувати</Link>
+              {(item.status === "AVAILABLE" || item.status === "INACTIVE") && (
+                <button
+                  onClick={() => handleToggleStatus(item.id, item.status)}
+                  className="action-link"
+                >
+                  {item.status === "AVAILABLE" ? "⛔ Деактивувати" : "✅ Активувати"}
+                </button>
+              )}
             </div>
           </div>
         ))}
       </div>
-      <Link to="/equipment/upload" className="upload-link">
-        ➕ Завантажити власне обладнання
-      </Link>
     </div>
   );
 };

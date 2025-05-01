@@ -113,3 +113,19 @@
   padding: 20px;
   color: #333;
 }
+
+.rent-button {
+  display: inline-block;
+  margin: 20px 0;
+  padding: 10px 20px;
+  background-color: #4CAF50;
+  color: white;
+  font-weight: bold;
+  text-decoration: none;
+  border-radius: 8px;
+  transition: background-color 0.3s ease;
+}
+
+.rent-button:hover {
+  background-color: #45a049;
+}
