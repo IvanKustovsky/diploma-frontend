@@ -199,13 +199,13 @@ export const fetchApprovedAdvertisementsByUserId = async (userId) => {
 
 export const approveAdvertisement = async (id, payload) => {
   try {
-    const response = await apiClient.post(`/advertisement/api/v1/${id}/approve`, payload); // TODO change endpoint to advertisement
+    const response = await apiClient.put(`/advertisement/api/v1/${id}/approve`, payload);
     return response.data;
   } catch (error) {
     if (error.response) {
       throw error.response;
     }
-    throw new Error("Не вдалося завантажити обладнання");
+    throw new Error("Не вдалося підтвердити оголошення");
   }
 };
 
@@ -217,7 +217,7 @@ export const rejectAdvertisement = async (id, payload) => {
     if (error.response) {
       throw error.response;
     }
-    throw new Error("Не вдалося завантажити обладнання");
+    throw new Error("Не вдалося відхилити оголошення");
   }
 };
 
@@ -230,6 +230,30 @@ export const fetchMyEquipments = async () => {
       throw error.response;
     }
     throw new Error("Не вдалося завантажити обладнання");
+  }
+};
+
+export const activateEquipment = async (id) => {
+  try {
+    const response = await apiClient.put(`/equipments/api/v1/${id}/activate`); // TODO Change to patch probably
+    return response.data;
+  } catch (error) {
+    if (error.response) {
+      throw error.response;
+    }
+    throw new Error("Не вдалося активувати обладнання");
+  }
+};
+
+export const deactivateEquipment = async (id) => {
+  try {
+    const response = await apiClient.put(`/equipments/api/v1/${id}/deactivate`);
+    return response.data;
+  } catch (error) {
+    if (error.response) {
+      throw error.response;
+    }
+    throw new Error("Не вдалося деактивувати обладнання");
   }
 };
 
@@ -340,5 +364,111 @@ export const uploadAdditionalImages = async (id, files) => {
   } catch (error) {
     console.error(`Помилка при завантаженні додаткових зображень для обладнання з ID ${id}:`, error);
     throw error;
+  }
+};
+
+/**
+ * Створити новий запит на оренду
+ * @param {object} rentalDto - DTO з даними для створення запиту на оренду
+ * @returns {Promise<object>} - Дані створеного запиту на оренду
+ * @throws {Error} - Якщо сервер повернув помилку або створення не вдалося
+ */
+export const createRental = async (rentalDto) => {
+  try {
+    const response = await apiClient.post("/rentals/api/v1", rentalDto);
+    return response.data;
+  } catch (error) {
+    if (error.response?.data?.errorMessage) {
+      throw new Error(error.response.data.errorMessage);
+    }
+    throw new Error("Не вдалося створити оренду");
+  }
+};
+
+/**
+ * Отримати запит на оренду по ID
+ * @param {number} rentalId
+ * @returns {Promise<object>}
+ */
+export const fetchRentalById = async (rentalId) => {
+  try {
+    const response = await apiClient.get(`/rentals/api/v1/${rentalId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Failed to fetch rental by ID:", error.response || error);
+    throw new Error(error.response?.data?.errorMessage || "Не вдалося завантажити запит");
+  }
+};
+
+/**
+ * Отримати орендні запити, які створив поточний користувач
+ * @param {number} [page=0] - Номер сторінки
+ * @param {number} [size=10] - Кількість елементів на сторінці
+ * @returns {Promise<object>} - Сторінка з орендними запитами
+ */
+export const fetchMyOutgoingRentals = async (page = 0, size = 10) => {
+  try {
+    const response = await apiClient.get(`/rentals/api/v1/outgoing`, {
+      params: { page, size }
+    });
+    return response.data;
+  } catch (error) {
+    throw new Error("Не вдалося отримати ваші орендні запити");
+  }
+};
+
+/**
+ * Отримати запити на оренду, які були зроблені на обладнання поточного користувача
+ * @param {number} [page=0] - Номер сторінки
+ * @param {number} [size=10] - Кількість елементів на сторінці
+ * @returns {Promise<object>} - Сторінка з вхідними орендними запитами
+ */
+export const fetchMyIncomingRentals = async (page = 0, size = 10) => {
+  try {
+    const response = await apiClient.get(`/rentals/api/v1/incoming`, {
+      params: { page, size }
+    });
+    return response.data;
+  } catch (error) {
+    throw new Error("Не вдалося отримати запити на ваше обладнання");
+  }
+};
+
+/**
+ * Затвердити запит на оренду
+ * @param {number} rentalId - ID запиту на оренду
+ * @returns {Promise<object>} - Дані відповіді сервера (ймовірно ResponseDto)
+ */
+export const approveRentalRequest = async (rentalId) => {
+  try {
+    // Використовуємо PUT запит відповідно до вашого контролера
+    const response = await apiClient.put(`/rentals/api/v1/${rentalId}/approve`);
+    console.log("Approve response:", response.data);
+    return response.data; // Повертаємо відповідь сервера
+  } catch (error) {
+    console.error(`Failed to approve rental request ${rentalId}:`, error.response || error);
+    // Перекидаємо помилку далі, щоб компонент міг її обробити
+    throw new Error(error.response?.data?.errorMessage || "Не вдалося затвердити запит");
+  }
+};
+
+/**
+ * Відхилити запит на оренду
+ * @param {number} rentalId - ID запиту на оренду
+ * @param {string} rejectionMessage - Причина відхилення
+ * @returns {Promise<object>} - Дані відповіді сервера (ймовірно ResponseDto)
+ */
+export const rejectRentalRequest = async (rentalId, rejectionMessage) => {
+  try {
+    // Створюємо тіло запиту відповідно до RejectRentalRequestDto
+    const requestBody = { rejectionMessage };
+    // Використовуємо PUT запит відповідно до вашого контролера
+    const response = await apiClient.put(`/rentals/api/v1/${rentalId}/reject`, requestBody);
+    console.log("Reject response:", response.data);
+    return response.data; // Повертаємо відповідь сервера
+  } catch (error) {
+    console.error(`Failed to reject rental request ${rentalId}:`, error.response || error);
+    // Перекидаємо помилку далі, щоб компонент міг її обробити
+    throw new Error(error.response?.data?.errorMessage || "Не вдалося відхилити запит");
   }
 };

@@ -79,3 +79,34 @@ export const validateAdminMessage = (message) => {
   }
   return errors;
 };
+
+export const validateRentalForm = (formData) => {
+  const errors = {};
+  const today = new Date();
+  // Set time to start of day to compare dates only
+  today.setHours(0, 0, 0, 0);
+
+  const startDate = new Date(formData.startDate);
+  const endDate = new Date(formData.endDate);
+
+  if (!formData.address.trim()) {
+    errors.address = "Адреса обов'язкова";
+  }
+
+  // Validate start date is not before today
+  if (!formData.startDate) {
+    errors.startDate = "Дата початку оренди обов'язкова";
+  } else if (startDate < today) {
+    errors.startDate = "Дата початку оренди не може бути раніше сьогоднішньої";
+  }
+
+  // Validate end date is after start date
+  if (!formData.endDate) {
+    errors.endDate = "Дата кінця оренди обов'язкова";
+  } else if (endDate <= startDate) {
+    errors.endDate = "Дата кінця оренди має бути пізніше за дату початку";
+  }
+
+
+  return errors;
+};

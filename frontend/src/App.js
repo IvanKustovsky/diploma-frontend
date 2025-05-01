@@ -21,6 +21,10 @@ import UserDetailsPage from "./pages/Users/UserDetailsPage";
 import Moderation from "./pages/Moderation/Moderation";
 import AdvertisementModerationPage from "./pages/Moderation/AdvertisementModerationPage";
 import UnauthorizedPage from "./pages/UnauthorizedPage";
+import RentFormPage from "./pages/Rentals/RentFormPage";
+import IncomingRentalRequestsPage from "./pages/Rentals/IncomingRentalRequestsPage";
+import OutgointRentalRequestsPage from "./pages/Rentals/OutgointRentalRequestsPage";
+import IncomingRentalRequestDetails from "./pages/Rentals/IncomingRentalRequestDetails";
 
 // Protected Route
 import ProtectedRoute from "./components/ui/ProtectedRoute";
@@ -46,6 +50,42 @@ function App() {
               element={
                 <ProtectedRoute>
                   <EditEquipmentPage />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/equipment/rent"
+              element={
+                <ProtectedRoute>
+                  <RentFormPage />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/incoming-rental-requests"
+              element={
+                <ProtectedRoute>
+                  <IncomingRentalRequestsPage />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/outgoing-rental-requests"
+              element={
+                <ProtectedRoute>
+                  <OutgointRentalRequestsPage />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/incoming-rental-requests/:id"
+              element={
+                <ProtectedRoute>
+                  <IncomingRentalRequestDetails />
                 </ProtectedRoute>
               }
             />
