@@ -45,5 +45,7 @@ export const rentalStatusTranslations = {
   APPROVED: "Схвалено",
   REJECTED: "Відхилено",
   CANCELLED: "Скасовано",
+  IN_PROGRESS: "В процесі оренди",
+  DECLINED_BY_SYSTEM: "Відхилено системою",
   COMPLETED: "Завершено",
 };

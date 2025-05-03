@@ -88,3 +88,25 @@
 .success-message button:hover {
     background-color: #218838;
 }
+
+.city-suggestions {
+    border: 1px solid #ccc;
+    max-height: 150px;
+    overflow-y: auto;
+    margin-top: 4px;
+    padding: 0;
+    list-style: none;
+    background-color: white;
+    position: absolute;
+    z-index: 10;
+    width: 100%;
+}
+
+.suggestion-item {
+    padding: 6px 10px;
+    cursor: pointer;
+}
+
+.suggestion-item:hover {
+    background-color: #eee;
+}

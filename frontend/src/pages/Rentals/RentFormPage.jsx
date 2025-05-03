@@ -1,26 +1,45 @@
-import React, { useState } from "react";
-import { createRental } from "../../services/api";
+import React, { useState, useMemo, useEffect } from "react";
+import { createRental, fetchEquipmentById } from "../../services/api";
 import "../../assets/RentFormPage.css";
 import { useNavigate, useLocation } from "react-router-dom";
 import { validateRentalForm } from "../../utils/validation";
+import cities from '../../data/cities.json';
+import { categoryTranslations } from '../../data/translations';
 
 const RentFormPage = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { equipmentId } = location.state || {};
 
+    const [equipment, setEquipment] = useState(null);
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
-    const [address, setAddress] = useState("");
-    const [error, setError] = useState(null); // Загальна помилка API або логіки
-    const [rentalValidationErrors, setRentalValidationErrors] = useState({}); // Стан для помилок валідації форми
-    const [isSuccess, setIsSuccess] = useState(false); // Стан для повідомлення про успіх
+    const [query, setQuery] = useState("");
+    const [selectedCity, setSelectedCity] = useState(null);
+    const [error, setError] = useState(null);
+    const [rentalValidationErrors, setRentalValidationErrors] = useState({});
+    const [isSuccess, setIsSuccess] = useState(false);
 
-    // Отримуємо поточну дату у форматі YYYY-MM-DD для атрибута min
+    useEffect(() => {
+        const loadEquipment = async () => {
+            try {
+                const data = await fetchEquipmentById(equipmentId);
+                setEquipment(data);
+            } catch (err) {
+                setError("Не вдалося завантажити дані обладнання.");
+                console.error(err);
+            }
+        };
+
+        if (equipmentId) {
+            loadEquipment();
+        }
+    }, [equipmentId]);
+
     const getTodayDateString = () => {
         const today = new Date();
         const year = today.getFullYear();
-        const month = String(today.getMonth() + 1).padStart(2, '0'); // Місяці від 0 до 11
+        const month = String(today.getMonth() + 1).padStart(2, '0');
         const day = String(today.getDate()).padStart(2, '0');
         return `${year}-${month}-${day}`;
     };
@@ -30,18 +49,19 @@ const RentFormPage = () => {
     const handleSubmit = async (event) => {
         event.preventDefault();
 
-        // Створюємо об'єкт з даними форми для валідації
-        const formData = { startDate, endDate, address };
-        const errors = validateRentalForm(formData); // Викликаємо функцію валідації
+        const fullAddress = selectedCity
+            ? `${selectedCity.city.trim()}, ${selectedCity.district.trim()}, ${selectedCity.region.trim()}`
+            : query;
 
-        // Перевіряємо, чи є помилки валідації
+        const formData = { startDate, endDate, address: fullAddress };
+        const errors = validateRentalForm(formData);
+
         if (Object.keys(errors).length > 0) {
-            setRentalValidationErrors(errors); // Встановлюємо помилки валідації
-            setError(null); // Очищаємо загальну помилку, якщо є помилки валідації
-            return; // Зупиняємо виконання, якщо є помилки валідації
+            setRentalValidationErrors(errors);
+            setError(null);
+            return;
         }
 
-        // Якщо валідація пройшла успішно, очищаємо попередні помилки валідації
         setRentalValidationErrors({});
 
         if (!equipmentId) {
@@ -53,7 +73,7 @@ const RentFormPage = () => {
             equipmentId,
             startDate,
             endDate,
-            address,
+            address: fullAddress,
         };
 
         try {
@@ -61,13 +81,24 @@ const RentFormPage = () => {
             setIsSuccess(true);
             setError(null);
         } catch (err) {
-            setError(err.message); // err.message вже буде зрозумілим для користувача
+            setError(err.message);
             console.error(err);
             setIsSuccess(false);
         }
     };
 
-    // Функція для повернення до списку обладнання
+    const filteredCities = useMemo(() => {
+        if (!query.trim()) return [];
+        return cities.filter(({ city }) =>
+            city.trim().toLowerCase().includes(query.trim().toLowerCase())
+        ).slice(0, 10);
+    }, [query]);
+
+    const handleSelect = (city) => {
+        setSelectedCity(city);
+        setQuery(`${city.city.trim()}, ${city.district.trim()}, ${city.region.trim()}`);
+    };
+
     const handleGoBackToEquipments = () => {
         navigate("/equipments");
     };
@@ -76,16 +107,23 @@ const RentFormPage = () => {
         <div className="rent-form-page">
             <h2>Створити оренду для обладнання</h2>
 
-            {isSuccess ? ( // Умовно рендеримо повідомлення про успіх або форму
+            {equipment && (
+                <div className="equipment-summary">
+                    <p><strong>Назва:</strong> {equipment.name}</p>
+                    <p><strong>Категорія:</strong> {categoryTranslations[equipment.category] || equipment.category}</p>
+                    <p><strong>Ціна:</strong> {equipment.price} грн</p>
+                </div>
+            )}
+
+            {isSuccess ? (
                 <div className="success-message">
                     <p>Оренду успішно створено!</p>
                     <p>Власника обладнання повідомлено. Будь ласка, очікуйте на його підтвердження.</p>
                     <button onClick={handleGoBackToEquipments}>Повернутись до пошуку обладнання</button>
                 </div>
             ) : (
-                // Рендеримо форму, якщо оренда ще не створена
                 <>
-                    {error && <p className="error">{error}</p>} {/* Відображення загальної помилки */}
+                    {error && <p className="error">{error}</p>}
                     <form onSubmit={handleSubmit}>
                         <div>
                             <label htmlFor="startDate">Дата початку оренди:</label>
@@ -95,17 +133,15 @@ const RentFormPage = () => {
                                 value={startDate}
                                 onChange={(e) => {
                                     setStartDate(e.target.value);
-                                    // Якщо дата початку змінюється і вона пізніше за поточну кінцеву,
-                                    // скидаємо кінцеву дату, щоб уникнути невалідного стану
                                     if (endDate && new Date(e.target.value) > new Date(endDate)) {
                                         setEndDate("");
                                     }
                                 }}
                                 required
-                                min={todayString} // Встановлюємо мінімальну дату - сьогодні
+                                min={todayString}
                             />
                             {rentalValidationErrors.startDate && (
-                                <p className="validation-error">{rentalValidationErrors.startDate}</p> // Відображення помилки валідації дати початку
+                                <p className="validation-error">{rentalValidationErrors.startDate}</p>
                             )}
                         </div>
                         <div>
@@ -116,23 +152,41 @@ const RentFormPage = () => {
                                 value={endDate}
                                 onChange={(e) => setEndDate(e.target.value)}
                                 required
-                                min={startDate || todayString} // Встановлюємо мінімальну дату - дата початку або сьогодні, якщо дата початку не обрана
+                                min={startDate || todayString}
                             />
                             {rentalValidationErrors.endDate && (
-                                <p className="validation-error">{rentalValidationErrors.endDate}</p> // Відображення помилки валідації дати кінця
+                                <p className="validation-error">{rentalValidationErrors.endDate}</p>
                             )}
                         </div>
                         <div>
-                            <label htmlFor="address">Адреса:</label>
+                            <label htmlFor="address">Місто (адреса):</label>
                             <input
                                 type="text"
                                 id="address"
-                                value={address}
-                                onChange={(e) => setAddress(e.target.value)}
+                                value={query}
+                                onChange={(e) => {
+                                    setQuery(e.target.value);
+                                    setSelectedCity(null);
+                                }}
                                 required
+                                placeholder="Введіть назву міста"
+                                autoComplete="off"
                             />
+                            {filteredCities.length > 0 && (
+                                <ul className="city-suggestions">
+                                    {filteredCities.map((city, index) => (
+                                        <li
+                                            key={index}
+                                            onClick={() => handleSelect(city)}
+                                            className="suggestion-item"
+                                        >
+                                            {city.city.trim()}, {city.district.trim()}, {city.region.trim()}
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
                             {rentalValidationErrors.address && (
-                                <p className="validation-error">{rentalValidationErrors.address}</p> // Відображення помилки валідації адреси
+                                <p className="validation-error">{rentalValidationErrors.address}</p>
                             )}
                         </div>
                         <button type="submit">Створити оренду</button>

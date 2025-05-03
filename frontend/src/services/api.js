@@ -472,3 +472,19 @@ export const rejectRentalRequest = async (rentalId, rejectionMessage) => {
     throw new Error(error.response?.data?.errorMessage || "Не вдалося відхилити запит");
   }
 };
+
+/**
+ * Скасувати запит на оренду (може зробити лише орендар, якщо ще не схвалено)
+ * @param {number} rentalId - ID запиту на оренду
+ * @returns {Promise<object>} - Дані відповіді сервера (ймовірно ResponseDto)
+ */
+export const cancelRentalRequest = async (rentalId) => {
+  try {
+    const response = await apiClient.put(`/rentals/api/v1/${rentalId}/cancel`);
+    console.log("Cancel response:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error(`Failed to cancel rental request ${rentalId}:`, error.response || error);
+    throw new Error(error.response?.data?.errorMessage || "Не вдалося скасувати запит");
+  }
+};
