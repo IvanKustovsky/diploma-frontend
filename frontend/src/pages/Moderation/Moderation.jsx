@@ -45,7 +45,7 @@ const Moderation = () => {
           {advertisements.map((ad) => (
             <div key={ad.id} className="equipment-card">
               <h3>{ad.equipmentName}</h3>
-              <p>Ціна: {ad.price} грн</p>
+              <p>Ціна за день: {ad.pricePerDay} грн</p>
               {imageUrls[ad.id] ? (
                 <img src={imageUrls[ad.id]} alt={ad.equipmentName} width="200" />
               ) : (

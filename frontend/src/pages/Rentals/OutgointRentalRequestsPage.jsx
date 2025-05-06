@@ -3,12 +3,13 @@ import {
     fetchMyOutgoingRentals,
     fetchEquipmentById,
     fetchImageById,
-    cancelRentalRequest
+    cancelRentalRequest,
+    downloadRentalPdf
 } from "../../services/api";
 import "../../assets/EquipmentsPage.css";
 import { rentalStatusTranslations } from '../../data/translations';
 
-const IncomingRentalRequestsPage = () => {
+const OutgoingRentalRequestsPage = () => {
     const [requests, setRequests] = useState([]);
     const [equipmentMap, setEquipmentMap] = useState({});
     const [imageMap, setImageMap] = useState({});
@@ -77,6 +78,14 @@ const IncomingRentalRequestsPage = () => {
         }
     };
 
+    const handleDownloadPdf = async (rentalId) => {
+        try {
+            await downloadRentalPdf(rentalId);
+        } catch (err) {
+            alert("Не вдалося завантажити PDF документ.");
+        }
+    };
+
     const handlePreviousPage = () => setCurrentPage(prev => Math.max(0, prev - 1));
     const handleNextPage = () => setCurrentPage(prev => Math.min(totalPages - 1, prev + 1));
     const handlePageSizeChange = (e) => {
@@ -100,7 +109,6 @@ const IncomingRentalRequestsPage = () => {
                         const equip = equipmentMap[request.equipmentId];
                         const imageUrl = imageMap[request.equipmentId];
                         const name = equip && !equip.error ? equip.name : `Обладнання ID: ${request.equipmentId}`;
-                        const price = equip && !equip.error ? `${equip.price} грн` : "Н/Д";
 
                         return (
                             <div key={request.id} className="equipment-card">
@@ -116,16 +124,23 @@ const IncomingRentalRequestsPage = () => {
                                 ) : (
                                     <div className="image-placeholder">Фото недоступне</div>
                                 )}
-                                <p><strong>Ціна:</strong> {price}</p>
+                                <p><strong>Ціна:</strong> {request.totalPrice} грн</p>
                                 <p><strong>Дати:</strong> {request.startDate} - {request.endDate}</p>
                                 <p><strong>Адреса:</strong> {request.address}</p>
-                                <p><strong>Статус:</strong> {rentalStatusTranslations[request.status] || request.status}</p>
+                                <p><strong>Статус:</strong> {rentalStatusTranslations[request.status] || request.status}
+                                    {request.status === 'APPROVED' && (
+                                        <> {new Date(request.ownerResponseAt).toLocaleString()}</>
+                                    )}</p>
 
                                 {request.status === "PENDING" && (
                                     <button onClick={() => handleCancel(request.id)}>
                                         Скасувати запит
                                     </button>
                                 )}
+
+                                <button onClick={() => handleDownloadPdf(request.id)}>
+                                    Завантажити договір
+                                </button>
                             </div>
                         );
                     })}
@@ -160,4 +175,4 @@ const IncomingRentalRequestsPage = () => {
     );
 };
 
-export default IncomingRentalRequestsPage;
+export default OutgoingRentalRequestsPage;

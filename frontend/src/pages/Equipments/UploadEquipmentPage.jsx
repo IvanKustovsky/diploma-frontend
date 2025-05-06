@@ -11,7 +11,7 @@ const UploadEquipmentPage = () => {
   const [category, setCategory] = useState("");
   const [subcategory, setSubcategory] = useState("");
   const [categoriesData, setCategoriesData] = useState({});
-  const [price, setPrice] = useState("");
+  const [pricePerDay, setPricePerDay] = useState("");
   const [condition, setCondition] = useState("NEW");
   const [imageFile, setImageFile] = useState(null);
   const [error, setError] = useState(null);
@@ -47,13 +47,13 @@ const UploadEquipmentPage = () => {
       description,
       category,
       subcategory,
-      price: parseFloat(price),
+      pricePerDay: pricePerDay.trim(),
       condition,
     };
 
     try {
       await registerEquipment(equipmentDto, imageFile);
-      navigate("/equipments");
+      navigate("/my-equipments");
     } catch (err) {
       setError("Не вдалося завантажити обладнання");
       console.error(err);
@@ -110,11 +110,11 @@ const UploadEquipmentPage = () => {
           </div>
         )}
         <div>
-          <label>Ціна:</label>
+          <label>Ціна за день оренди (грн):</label>
           <input
             type="number"
-            value={price}
-            onChange={(e) => setPrice(e.target.value)}
+            value={pricePerDay}
+            onChange={(e) => setPricePerDay(e.target.value)}
             required
           />
         </div>

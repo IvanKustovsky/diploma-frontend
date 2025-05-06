@@ -115,7 +115,7 @@ const AdvertisementModerationPage = () => {
             equipment.condition === "USED" ? "Вживаний" :
               "Відновлений"
         }</p>
-        <p><strong>Ціна:</strong> {equipment.price} грн</p>
+        <p><strong>Ціна за день:</strong> {equipment.pricePerDay} грн</p>
       </div>
 
       <div className="moderation">

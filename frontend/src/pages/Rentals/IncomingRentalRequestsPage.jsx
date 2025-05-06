@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import {
-    fetchMyIncomingRentals,
+    fetchMyOutgoingRentals,
     fetchEquipmentById,
     fetchImageById,
+    cancelRentalRequest,
+    downloadRentalPdf
 } from "../../services/api";
 import "../../assets/EquipmentsPage.css";
 import { rentalStatusTranslations } from '../../data/translations';
@@ -19,53 +20,63 @@ const IncomingRentalRequestsPage = () => {
     const [pageSize, setPageSize] = useState(5);
     const [totalPages, setTotalPages] = useState(0);
 
-    useEffect(() => {
-        const loadData = async () => {
-            setLoading(true);
-            setError(null);
-            try {
-                const pageData = await fetchMyIncomingRentals(currentPage, pageSize);
-                setRequests(pageData.content || []);
-                setTotalPages(pageData.totalPages || 0);
-                setCurrentPage(pageData.number || 0);
+    const loadData = async () => {
+        setLoading(true);
+        setError(null);
+        try {
+            const pageData = await fetchMyOutgoingRentals(currentPage, pageSize);
+            setRequests(pageData.content || []);
+            setTotalPages(pageData.totalPages || 0);
+            setCurrentPage(pageData.number || 0);
 
-                const uniqueIds = [...new Set((pageData.content || []).map(r => r.equipmentId))];
-                const newEquip = {};
-                const newImages = {};
+            const uniqueIds = [...new Set((pageData.content || []).map(r => r.equipmentId))];
+            const newEquip = {};
+            const newImages = {};
 
-                for (const id of uniqueIds) {
-                    try {
-                        const equip = await fetchEquipmentById(id);
-                        newEquip[id] = equip;
-                        if (equip.mainImageId) {
-                            try {
-                                const imageUrl = await fetchImageById(equip.mainImageId);
-                                newImages[id] = imageUrl;
-                            } catch {
-                                newImages[id] = null;
-                            }
-                        } else {
+            for (const id of uniqueIds) {
+                try {
+                    const equip = await fetchEquipmentById(id);
+                    newEquip[id] = equip;
+                    if (equip.mainImageId) {
+                        try {
+                            const imageUrl = await fetchImageById(equip.mainImageId);
+                            newImages[id] = imageUrl;
+                        } catch {
                             newImages[id] = null;
                         }
-                    } catch {
-                        newEquip[id] = { error: true };
+                    } else {
                         newImages[id] = null;
                     }
+                } catch {
+                    newEquip[id] = { error: true };
+                    newImages[id] = null;
                 }
-
-                setEquipmentMap(newEquip);
-                setImageMap(newImages);
-            } catch (err) {
-                console.error("Помилка при завантаженні:", err);
-                setError("Не вдалося завантажити запити на оренду.");
-                setRequests([]);
-            } finally {
-                setLoading(false);
             }
-        };
 
+            setEquipmentMap(newEquip);
+            setImageMap(newImages);
+        } catch (err) {
+            console.error("Помилка при завантаженні:", err);
+            setError("Не вдалося завантажити запити на оренду.");
+            setRequests([]);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
         loadData();
     }, [currentPage, pageSize]);
+
+    const handleCancel = async (rentalId) => {
+        if (!window.confirm("Ви впевнені, що хочете скасувати цей запит?")) return;
+        try {
+            await cancelRentalRequest(rentalId);
+            await loadData();
+        } catch (err) {
+            alert(err.message);
+        }
+    };
 
     const handlePreviousPage = () => setCurrentPage(prev => Math.max(0, prev - 1));
     const handleNextPage = () => setCurrentPage(prev => Math.min(totalPages - 1, prev + 1));
@@ -74,9 +85,17 @@ const IncomingRentalRequestsPage = () => {
         setCurrentPage(0);
     };
 
+    const handleDownloadPdf = async (rentalId) => {
+        try {
+            await downloadRentalPdf(rentalId);  // Викликаємо метод для завантаження PDF
+        } catch (err) {
+            alert("Не вдалося завантажити PDF документ.");
+        }
+    };
+
     return (
         <div className="equipments-page">
-            <h2>Запити на оренду мого обладнання</h2>
+            <h2>Мої запити на оренду</h2>
 
             {loading && <div className="loading">Завантаження...</div>}
             {error && <p className="error">{error}</p>}
@@ -90,7 +109,6 @@ const IncomingRentalRequestsPage = () => {
                         const equip = equipmentMap[request.equipmentId];
                         const imageUrl = imageMap[request.equipmentId];
                         const name = equip && !equip.error ? equip.name : `Обладнання ID: ${request.equipmentId}`;
-                        const price = equip && !equip.error ? `${equip.price} грн` : "Н/Д";
 
                         return (
                             <div key={request.id} className="equipment-card">
@@ -106,14 +124,24 @@ const IncomingRentalRequestsPage = () => {
                                 ) : (
                                     <div className="image-placeholder">Фото недоступне</div>
                                 )}
-                                <p><strong>Ціна:</strong> {price}</p>
+                                <p><strong>Ціна:</strong> {request.totalPrice} грн</p>
                                 <p><strong>Дати:</strong> {request.startDate} - {request.endDate}</p>
                                 <p><strong>Адреса:</strong> {request.address}</p>
-                                <p><strong>Статус:</strong> {rentalStatusTranslations[request.status] || request.status}</p>
+                                <p><strong>Статус:</strong> {rentalStatusTranslations[request.status] || request.status}
+                                    {request.status === 'APPROVED' && (
+                                        <> {new Date(request.ownerResponseAt).toLocaleString()}</>
+                                    )}</p>
 
-                                <div className="request-actions">
-                                    <Link to={`/incoming-rental-requests/${request.id}`} className="details-btn">Детальніше</Link>
-                                </div>
+                                {request.status === "PENDING" && (
+                                    <button onClick={() => handleCancel(request.id)}>
+                                        Скасувати запит
+                                    </button>
+                                )}
+
+                                {/* Кнопка для завантаження PDF */}
+                                <button onClick={() => handleDownloadPdf(request.id)}>
+                                    Завантажити договір
+                                </button>
                             </div>
                         );
                     })}

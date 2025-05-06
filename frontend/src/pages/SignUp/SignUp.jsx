@@ -44,7 +44,11 @@ const SignUp = () => {
         await registerUser(bodyData);
         setSuccess(true);
       } catch (err) {
-        setError(err.data?.errorMessage || "Щось пішло не так");
+        if (err.status === 503 || err.status === 500) {
+          setError("Сервіс тимчасово недоступний. Спробуйте ще раз пізніше.");
+        } else {
+          setError(err.data?.errorMessage || "Щось пішло не так");
+        }
         setSuccess(false);
       }
   };

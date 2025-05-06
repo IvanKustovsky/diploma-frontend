@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { fetchEquipmentById, fetchImageById } from "../../services/api";
+import { fetchEquipmentById, fetchImageById, fetchCurrentUserId } from "../../services/api";
 import "../../assets/EquipmentDetailsPage.css";
 import { categoryTranslations, subcategoryTranslations } from '../../data/translations';
 
 const EquipmentDetailsPage = () => {
   const { id } = useParams();
   const [equipment, setEquipment] = useState(null);
+  const [currentUserId, setCurrentUserId] = useState(null);
   const [images, setImages] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [error, setError] = useState(null);
@@ -24,6 +25,19 @@ const EquipmentDetailsPage = () => {
 
     loadEquipment();
   }, [id]);
+
+  useEffect(() => {
+    const loadUserId = async () => {
+      try {
+        const id = await fetchCurrentUserId();
+        setCurrentUserId(id);
+      } catch (err) {
+        console.error("Не вдалося отримати userId:", err);
+      }
+    };
+
+    loadUserId();
+  }, []);
 
   useEffect(() => {
     const loadImages = async () => {
@@ -89,14 +103,16 @@ const EquipmentDetailsPage = () => {
             equipment.condition === "USED" ? "Вживаний" :
               "Відновлений"
         }</p>
-        <p><strong>Ціна:</strong> {equipment.price} грн</p>
+        <p><strong>Ціна за день:</strong> {equipment.pricePerDay} грн</p>
         <Link to="/user-profile" state={{ userId: equipment.userId }}>
           👤 Переглянути профіль
         </Link>
       </div>
-      <Link to="/equipment/rent" state={{ equipmentId: equipment.id }} className="rent-button">
-        📝 Оформити оренду
-      </Link>
+      {currentUserId !== equipment.userId && (
+        <Link to="/equipment/rent" state={{ equipmentId: equipment.id }} className="rent-button">
+          📝 Оформити оренду
+        </Link>
+      )}
 
       <Link className="back-link" to="/equipments">⬅️ Назад до списку</Link>
     </div>

@@ -90,7 +90,6 @@
 
 .additional-images-gallery {
   display: flex;
-  flex-wrap: wrap; /* НЕ ПОТРІБНО - викликає перенос */
   gap: 10px;
   margin-bottom: 15px;
 }

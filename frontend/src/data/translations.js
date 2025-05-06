@@ -49,3 +49,10 @@ export const rentalStatusTranslations = {
   DECLINED_BY_SYSTEM: "Відхилено системою",
   COMPLETED: "Завершено",
 };
+
+export const advertisementStatusTranslations = {
+  CREATED: "Очікує підтвердження модератором",
+  UPDATED: "Очікує підтвердження модератором",
+  APPROVED: "Схвалено модератором",
+  REJECTED: "Відхилено",
+};

@@ -2,14 +2,14 @@ import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import {
   fetchEquipmentById,
-  fetchImageById, // Використовуємо для отримання URL зображень
+  fetchImageById, 
   updateEquipment,
   uploadMainImage,
   uploadAdditionalImages,
   getCategoriesWithSubcategories
 } from "../../services/api";
 import { categoryTranslations, subcategoryTranslations } from '../../data/translations';
-import "../../assets/EditEquipmentPage.css"; // Переконайтесь, що CSS файл існує та підключений
+import "../../assets/EditEquipmentPage.css";
 import { validateEquipment } from "../../utils/validation";
 
 const EditEquipmentPage = () => {
@@ -18,10 +18,10 @@ const EditEquipmentPage = () => {
   const [categoriesData, setCategoriesData] = useState({});
   const [mainImagePreview, setMainImagePreview] = useState(null);
   const [mainImageFile, setMainImageFile] = useState(null);
-  const [additionalImages, setAdditionalImages] = useState([]); // Для завантаження нових
-  const [additionalImagePreviews, setAdditionalImagePreviews] = useState([]); // Для відображення існуючих
+  const [additionalImages, setAdditionalImages] = useState([]); 
+  const [additionalImagePreviews, setAdditionalImagePreviews] = useState([]);
   const [validationErrors, setValidationErrors] = useState({});
-  const [isLoadingImages, setIsLoadingImages] = useState(false); // Стан завантаження зображень
+  const [isLoadingImages, setIsLoadingImages] = useState(false);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -51,8 +51,6 @@ const EditEquipmentPage = () => {
             setMainImagePreview(imgUrl);
           } catch (imgErr) {
             console.error(`Помилка завантаження головного зображення ID ${data.mainImageId}:`, imgErr);
-            // Можна встановити зображення-заглушку
-            // setMainImagePreview('/path/to/placeholder.png');
           }
         }
 
@@ -182,9 +180,10 @@ const EditEquipmentPage = () => {
       document.querySelector('input[type="file"][multiple]').value = ""; // Очищаємо input
       reloadImages(); // Перезавантажуємо зображення для відображення змін
     } catch (err) {
+      console.log(err)
       // Перевірка на конкретну помилку ліміту (якщо бекенд її повертає)
-      if (err.response && err.response.data && err.response.data.message && err.response.data.message.includes("Limit exceeded")) {
-        alert("Помилка: Перевищено ліміт зображень для цього оголошення.");
+      if (err.data?.errorMessage.includes("Досягнуто загальний ліміт")) {
+        alert("Помилка: " + err.data?.errorMessage);
       } else {
         alert("Помилка завантаження зображень.");
       }
@@ -283,13 +282,13 @@ const EditEquipmentPage = () => {
       </div>
 
       <div>
-        <label>Ціна:</label>
+        <label>Ціна за день (грн):</label>
         <input
           type="number"
           name="price"
-          value={equipment.price}
+          value={equipment.pricePerDay}
           onChange={handleFieldChange}
-          min="0" // Додаємо мінімальне значення
+          min="0"
         />
         {validationErrors.price && (
           <p className="error-message">{validationErrors.price}</p>

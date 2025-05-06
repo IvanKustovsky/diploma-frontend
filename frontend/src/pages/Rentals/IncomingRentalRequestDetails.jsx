@@ -27,6 +27,7 @@ const IncomingRentalRequestDetails = () => {
       try {
         // Очікується, що у вас є метод отримання rental по id
         const rentalData = await fetchRentalById(id);
+        console.log("Rental data" , rentalData)
         setRental(rentalData);
 
         const equipmentData = await fetchEquipmentById(rentalData.equipmentId);
@@ -106,7 +107,7 @@ const IncomingRentalRequestDetails = () => {
             equipment.condition === "USED" ? "Вживаний" :
               "Відновлений"
         }</p>
-        <p><strong>Ціна:</strong> {equipment.price} грн</p>
+        <p><strong>Ціна:</strong> {rental.totalPrice} грн</p>
         <p><strong>Період:</strong> {rental.startDate} - {rental.endDate}</p>
         <p><strong>Адреса:</strong> {rental.address}</p>
         <Link to="/user-profile" state={{ userId: rental.renterId }}>👤 Профіль орендаря</Link>

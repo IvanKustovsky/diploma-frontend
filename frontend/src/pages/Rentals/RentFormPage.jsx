@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect, useRef } from "react";
 import { createRental, fetchEquipmentById } from "../../services/api";
 import "../../assets/RentFormPage.css";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -14,11 +14,13 @@ const RentFormPage = () => {
     const [equipment, setEquipment] = useState(null);
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
+    const [totalPrice, setTotalPrice] = useState(0);
     const [query, setQuery] = useState("");
     const [selectedCity, setSelectedCity] = useState(null);
     const [error, setError] = useState(null);
     const [rentalValidationErrors, setRentalValidationErrors] = useState({});
     const [isSuccess, setIsSuccess] = useState(false);
+    const messageRef = useRef(null);
 
     useEffect(() => {
         const loadEquipment = async () => {
@@ -36,6 +38,25 @@ const RentFormPage = () => {
         }
     }, [equipmentId]);
 
+    useEffect(() => {
+        if (messageRef.current) {
+            messageRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
+    }, [isSuccess, error]);
+
+    useEffect(() => {
+        if (startDate && endDate && equipment) {
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+            const diffTime = end.getTime() - start.getTime();
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // +1 день включно
+            const calculatedPrice = diffDays > 0 ? diffDays * equipment.pricePerDay : 0;
+            setTotalPrice(calculatedPrice);
+        } else {
+            setTotalPrice(0);
+        }
+    }, [startDate, endDate, equipment]);
+
     const getTodayDateString = () => {
         const today = new Date();
         const year = today.getFullYear();
@@ -51,7 +72,7 @@ const RentFormPage = () => {
 
         const fullAddress = selectedCity
             ? `${selectedCity.city.trim()}, ${selectedCity.district.trim()}, ${selectedCity.region.trim()}`
-            : query;
+            : query.trim();
 
         const formData = { startDate, endDate, address: fullAddress };
         const errors = validateRentalForm(formData);
@@ -81,7 +102,7 @@ const RentFormPage = () => {
             setIsSuccess(true);
             setError(null);
         } catch (err) {
-            setError(err.message);
+            setError(err.message || "Сталася помилка при створенні оренди.");
             console.error(err);
             setIsSuccess(false);
         }
@@ -111,19 +132,21 @@ const RentFormPage = () => {
                 <div className="equipment-summary">
                     <p><strong>Назва:</strong> {equipment.name}</p>
                     <p><strong>Категорія:</strong> {categoryTranslations[equipment.category] || equipment.category}</p>
-                    <p><strong>Ціна:</strong> {equipment.price} грн</p>
+                    {totalPrice > 0 && (
+                        <p><strong>Сума за весь період:</strong> {totalPrice} грн</p>
+                    )}
                 </div>
             )}
 
             {isSuccess ? (
-                <div className="success-message">
+                <div className="success-message" ref={messageRef}>
                     <p>Оренду успішно створено!</p>
                     <p>Власника обладнання повідомлено. Будь ласка, очікуйте на його підтвердження.</p>
                     <button onClick={handleGoBackToEquipments}>Повернутись до пошуку обладнання</button>
                 </div>
             ) : (
                 <>
-                    {error && <p className="error">{error}</p>}
+                    {error && <p className="error" ref={messageRef}>{error}</p>}
                     <form onSubmit={handleSubmit}>
                         <div>
                             <label htmlFor="startDate">Дата початку оренди:</label>

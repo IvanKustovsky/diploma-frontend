@@ -29,8 +29,7 @@ apiClient.interceptors.request.use((config) => {
   const openApiPaths = [
     "/users/api/v1/register",
     "/auth/api/v1/login",
-    "/auth/api/v1/refresh",
-    "/advertisement/api/v1/approved"
+    "/auth/api/v1/refresh"
   ];
 
   const url = config.url?.replace(apiClient.defaults.baseURL, "") || "";
@@ -90,6 +89,18 @@ export const registerUser = async (userData) => {
       throw error.response; // Кидаємо всю відповідь з сервера
     }
     throw new Error("Щось пішло не так"); // Загальна помилка
+  }
+};
+
+export const fetchCurrentUserId = async () => {
+  try {
+    const response = await apiClient.get("/users/api/v1/getUserIdFromToken");
+    return response.data; 
+  } catch (error) {
+    if (error.response) {
+      throw error.response;
+    }
+    throw new Error("Не вдалося отримати userId");
   }
 };
 
@@ -153,8 +164,8 @@ export const refreshToken = async () => {
 
 export const fetchPendingAdvertisements = async () => {
   try {
-    const response = await apiClient.get("/advertisement/api/v1/pending"); // TODO change endpoint to advertisement
-    return response.data.content;  // TODO Check if only "content" actually needed
+    const response = await apiClient.get("/advertisement/api/v1/pending");
+    return response.data.content;
   } catch (error) {
     if (error.response) {
       throw error.response;
@@ -163,16 +174,14 @@ export const fetchPendingAdvertisements = async () => {
   }
 };
 
-export const fetchApprovedAdvertisements = async (page = 0, size = 2) => {
+export const fetchApprovedAdvertisements = async (page = 0, size = process.env.REACT_APP_PAGE_SIZE) => {
   try {
-    // Додаємо параметри page та size до URL
     const response = await apiClient.get("/advertisement/api/v1/approved", {
       params: {
-        page: page, // номер сторінки (0-based index)
-        size: size, // кількість елементів на сторінці
+        page: page,
+        size: size,
       },
     });
-    // Повертаємо весь об'єкт Page, отриманий від бекенду
     return response.data;
   } catch (error) {
     console.error("Помилка завантаження затверджених оголошень:", error);
@@ -185,10 +194,15 @@ export const fetchApprovedAdvertisements = async (page = 0, size = 2) => {
   }
 };
 
-export const fetchApprovedAdvertisementsByUserId = async (userId) => {
+export const fetchApprovedAdvertisementsByUserId = async (userId, page = 0, size = process.env.REACT_APP_PAGE_SIZE) => {
   try {
-    const response = await apiClient.get(`/advertisement/api/v1/approved/user/${userId}`); // TODO change endpoint to advertisement
-    return response.data.content;  // TODO Check if only "content" actually needed
+    const response = await apiClient.get(`/advertisement/api/v1/approved/user/${userId}`, {
+      params: {
+        page: page,
+        size: size,
+      },
+    });
+    return response.data;
   } catch (error) {
     if (error.response) {
       throw error.response;
@@ -211,7 +225,7 @@ export const approveAdvertisement = async (id, payload) => {
 
 export const rejectAdvertisement = async (id, payload) => {
   try {
-    const response = await apiClient.post(`/advertisement/api/v1/${id}/reject`, payload); // TODO change endpoint to advertisement
+    const response = await apiClient.put(`/advertisement/api/v1/${id}/reject`, payload); // TODO change endpoint to advertisement
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -221,10 +235,15 @@ export const rejectAdvertisement = async (id, payload) => {
   }
 };
 
-export const fetchMyEquipments = async () => {
+export const fetchMyAdvertisements = async (page = 0, size = process.env.REACT_APP_PAGE_SIZE) => {
   try {
-    const response = await apiClient.get("/equipments/api/v1/my");
-    return response.data.content; // Повертаємо тільки масив об'єктів обладнання
+    const response = await apiClient.get("/advertisement/api/v1/my", {
+      params: {
+        page: page, 
+        size: size,
+      },
+    });
+    return response.data;
   } catch (error) {
     if (error.response) {
       throw error.response;
@@ -247,7 +266,7 @@ export const activateEquipment = async (id) => {
 
 export const deactivateEquipment = async (id) => {
   try {
-    const response = await apiClient.put(`/equipments/api/v1/${id}/deactivate`);
+    const response = await apiClient.put(`/equipments/api/v1/${id}/deactivate`);  // TODO Change to patch probably
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -304,7 +323,7 @@ export const registerEquipment = async (equipmentDto, file) => {
 
     const response = await apiClient.post("/equipments/api/v1/register", formData, {
       headers: {
-        "Content-Type": "multipart/form-data", // не обов'язково, axios сам поставить, але можна явно
+        "Content-Type": "multipart/form-data",
       },
     });
 
@@ -362,8 +381,11 @@ export const uploadAdditionalImages = async (id, files) => {
 
     return response.data;
   } catch (error) {
-    console.error(`Помилка при завантаженні додаткових зображень для обладнання з ID ${id}:`, error);
-    throw error;
+    console.log(error)
+    if (error.response) {
+      throw error.response;
+    }
+    throw new Error("Помилка при завантаженні додаткових зображень для обладнання з ID ${id}:");
   }
 };
 
@@ -406,7 +428,7 @@ export const fetchRentalById = async (rentalId) => {
  * @param {number} [size=10] - Кількість елементів на сторінці
  * @returns {Promise<object>} - Сторінка з орендними запитами
  */
-export const fetchMyOutgoingRentals = async (page = 0, size = 10) => {
+export const fetchMyOutgoingRentals = async (page = 0, size = process.env.REACT_APP_PAGE_SIZE) => {
   try {
     const response = await apiClient.get(`/rentals/api/v1/outgoing`, {
       params: { page, size }
@@ -423,7 +445,7 @@ export const fetchMyOutgoingRentals = async (page = 0, size = 10) => {
  * @param {number} [size=10] - Кількість елементів на сторінці
  * @returns {Promise<object>} - Сторінка з вхідними орендними запитами
  */
-export const fetchMyIncomingRentals = async (page = 0, size = 10) => {
+export const fetchMyIncomingRentals = async (page = 0, size = process.env.REACT_APP_PAGE_SIZE) => {
   try {
     const response = await apiClient.get(`/rentals/api/v1/incoming`, {
       params: { page, size }
@@ -486,5 +508,39 @@ export const cancelRentalRequest = async (rentalId) => {
   } catch (error) {
     console.error(`Failed to cancel rental request ${rentalId}:`, error.response || error);
     throw new Error(error.response?.data?.errorMessage || "Не вдалося скасувати запит");
+  }
+};
+
+/**
+ * Завантажити PDF документ для орендного запиту
+ * @param {number} rentalId - ID орендного запиту
+ * @returns {Promise<void>}
+ */
+export const downloadRentalPdf = async (rentalId) => {
+  try {
+    // Замість apiClient, використовуйте ваш клієнт для запитів
+    const response = await apiClient.get(`/rentals/api/v1/${rentalId}/pdf`, {
+      responseType: 'arraybuffer',  // Важливо, щоб PDF був отриманий у вигляді бінарних даних
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('access_token')}`  // передайте токен авторизації, якщо необхідно
+      }
+    });
+
+    // Створити об'єкт Blob з отриманих даних
+    const pdfBlob = new Blob([response.data], { type: 'application/pdf' });
+
+    // Створити URL для Blob
+    const pdfUrl = window.URL.createObjectURL(pdfBlob);
+
+    // Створити тимчасове посилання для завантаження
+    const link = document.createElement('a');
+    link.href = pdfUrl;
+    link.download = `rental_${rentalId}.pdf`;  // Назва файлу
+    document.body.appendChild(link);
+    link.click();  // Клік по лінку для завантаження
+    document.body.removeChild(link);  // Видалити тимчасове посилання
+  } catch (error) {
+    console.error("Помилка при завантаженні PDF:", error);
+    alert("Не вдалося завантажити PDF документ для цього оренду.");
   }
 };

@@ -92,7 +92,6 @@
   box-sizing: border-box;
 }
 
-
 .equipment-card p {
   margin: 0.5rem 0;
   font-size: 1rem;
@@ -123,6 +122,28 @@
 
 .equipment-card a:active {
   transform: scale(0.98);
+}
+
+.admin-message {
+  background-color: #fdecea;
+  color: #c0392b;
+  border: 1px solid #e74c3c;
+  border-radius: 8px;
+  padding: 0.6rem;
+  margin: 0.5rem 0;
+  font-weight: 500;
+}
+
+/* Стан: Доступне */
+.status-available {
+  background-color: #eafaf1;
+  border-left: 6px solid #2ecc71;
+}
+
+/* Стан: Неактивне */
+.status-inactive {
+  background-color: #fef9e7;
+  border-left: 6px solid #f1c40f;
 }
 
 /* Стиль для повідомлення про відсутність елементів */

@@ -1,9 +1,10 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import { fetchImageById, fetchApprovedAdvertisements } from "../../services/api";
 import { Link } from "react-router-dom";
-import "../../assets/EquipmentsPage.css"; // Стилі імпортовано тут
+import "../../assets/EquipmentsPage.css";
 
 const EquipmentsPage = () => {
+  const DEFAULT_PAGE_SIZE = parseInt(process.env.REACT_APP_PAGE_SIZE || "2", 10);
   const [equipments, setEquipments] = useState([]);
   const [imageUrls, setImageUrls] = useState({});
   const [error, setError] = useState(null);
@@ -11,7 +12,7 @@ const EquipmentsPage = () => {
   const [isFetchingImages, setIsFetchingImages] = useState(false);
 
   const [currentPage, setCurrentPage] = useState(0);
-  const [pageSize, setPageSize] = useState(5);
+  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   const [totalPages, setTotalPages] = useState(0);
 
   // Ref для відстеження всіх blob-URL
@@ -171,7 +172,7 @@ const EquipmentsPage = () => {
                     }
                   </div>
                 )}
-                <p><strong>Ціна:</strong> {item.price} грн</p>
+                <p><strong>Ціна за день:</strong> {item.pricePerDay} грн</p>
                 <Link to={`/equipment/${item.id}`}>Детальніше</Link>
               </div>
             );
