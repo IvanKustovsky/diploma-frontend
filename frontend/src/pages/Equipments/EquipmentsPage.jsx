@@ -1,7 +1,8 @@
-import React, { useEffect, useState, useCallback, useRef } from "react";
-import { fetchImageById, fetchApprovedAdvertisements } from "../../services/api";
+import { useEffect, useState, useCallback, useRef } from "react";
+import { fetchImageById, searchAdvertisements, getCategoriesWithSubcategories } from "../../services/api";
 import { Link } from "react-router-dom";
 import "../../assets/EquipmentsPage.css";
+import { categoryTranslations, subcategoryTranslations } from '../../data/translations';
 
 const EquipmentsPage = () => {
   const DEFAULT_PAGE_SIZE = parseInt(process.env.REACT_APP_PAGE_SIZE || "2", 10);
@@ -15,57 +16,55 @@ const EquipmentsPage = () => {
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   const [totalPages, setTotalPages] = useState(0);
 
-  // Ref для відстеження всіх blob-URL
+  const [filters, setFilters] = useState({
+    category: "",
+    subcategory: "",
+    condition: "",
+    minPrice: "",
+    maxPrice: "",
+    keyword: "",
+  });
+
+  const [categoriesData, setCategoriesData] = useState({});
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   const blobUrlsRef = useRef(new Set());
 
-  // --- Функція для завантаження зображень ---
-  const fetchAndSetImage = useCallback(async (itemId, imageId) => {
-    let alreadyExists = false;
-    setImageUrls(currentUrls => {
-      if (currentUrls[itemId]) {
-        alreadyExists = true;
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const data = await getCategoriesWithSubcategories();
+        setCategoriesData(data);
+      } catch (err) {
+        console.error("Error loading categories:", err);
       }
-      return currentUrls;
-    });
+    };
+    fetchCategories();
+  }, []);
 
-    if (alreadyExists) {
-      return;
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+    if (name === "category") {
+      setFilters((prevFilters) => ({ ...prevFilters, category: value, subcategory: "" }));
+    } else {
+      setFilters((prevFilters) => ({ ...prevFilters, [name]: value }));
     }
+  };
 
-    try {
-      const imageBlobUrl = await fetchImageById(imageId);
-      if (imageBlobUrl) {
-        setImageUrls(prevUrls => ({
-          ...prevUrls,
-          [itemId]: imageBlobUrl,
-        }));
-        blobUrlsRef.current.add(imageBlobUrl);
-      } else {
-        setImageUrls(prevUrls => ({
-          ...prevUrls,
-          [itemId]: null,
-        }));
-      }
-    } catch (error) {
-      console.error(`Failed to fetch image ${imageId} for item ${itemId}:`, error);
-      setImageUrls(prevUrls => ({
-        ...prevUrls,
-        [itemId]: null,
-      }));
-    }
-  }, []); // Залежності useCallback пусті, оскільки fetchImageById є імпортованою функцією
+  const handleSearch = () => {
+    setCurrentPage(0);
+    loadEquipments(0, pageSize, filters);
+  };
 
-  // --- Функція для завантаження списку обладнання ---
-  const loadEquipments = useCallback(async (page, size) => {
+  const loadEquipments = useCallback(async (page, size, filters) => {
     setIsLoadingList(true);
     setError(null);
     try {
-      const pageData = await fetchApprovedAdvertisements(page, size);
+      const pageData = await searchAdvertisements(filters, page, size);
       console.log("Page data fetched: ", pageData);
       setEquipments(pageData.content || []);
       setTotalPages(pageData.totalPages || 0);
       setCurrentPage(pageData.number || 0);
-      setPageSize(pageData.size || size); // Оновлюємо розмір сторінки з відповіді, якщо він є
+      setPageSize(pageData.size || size);
     } catch (err) {
       console.error("Failed to load equipment list:", err);
       setError("Не вдалося завантажити обладнання");
@@ -74,62 +73,177 @@ const EquipmentsPage = () => {
     } finally {
       setIsLoadingList(false);
     }
-  }, []); // Залежності: fetchApprovedAdvertisements
+  }, []);
 
-  // --- Ефект для завантаження списку при зміні сторінки або розміру ---
   useEffect(() => {
-    loadEquipments(currentPage, pageSize);
+    loadEquipments(currentPage, pageSize, filters);
   }, [currentPage, pageSize, loadEquipments]);
 
-  // --- Ефект для завантаження зображень для поточного списку ---
-  useEffect(() => {
-    if (equipments.length === 0) {
-      return;
+  const fetchAndSetImage = useCallback(async (itemId, imageId) => {
+    let alreadyExists = false;
+    setImageUrls((currentUrls) => {
+      if (currentUrls[itemId]) {
+        alreadyExists = true;
+      }
+      return currentUrls;
+    });
+
+    if (alreadyExists) return;
+
+    try {
+      const imageBlobUrl = await fetchImageById(imageId);
+      if (imageBlobUrl) {
+        setImageUrls((prevUrls) => ({
+          ...prevUrls,
+          [itemId]: imageBlobUrl,
+        }));
+        blobUrlsRef.current.add(imageBlobUrl);
+      } else {
+        setImageUrls((prevUrls) => ({
+          ...prevUrls,
+          [itemId]: null,
+        }));
+      }
+    } catch (error) {
+      console.error(`Failed to fetch image ${imageId} for item ${itemId}:`, error);
+      setImageUrls((prevUrls) => ({
+        ...prevUrls,
+        [itemId]: null,
+      }));
     }
+  }, []);
+
+  useEffect(() => {
+    if (equipments.length === 0) return;
 
     const fetchImagesForCurrentList = async () => {
       setIsFetchingImages(true);
       const imagePromises = equipments
-        .filter(item => item.mainImageId && imageUrls[item.id] === undefined) // Завантажуємо тільки якщо ID є і URL ще не існує
-        .map(item => fetchAndSetImage(item.id, item.mainImageId));
+        .filter((item) => item.mainImageId && imageUrls[item.id] === undefined)
+        .map((item) => fetchAndSetImage(item.id, item.mainImageId));
       await Promise.allSettled(imagePromises);
       setIsFetchingImages(false);
     };
 
     fetchImagesForCurrentList();
-  }, [equipments, fetchAndSetImage, imageUrls]); // Залежності: список обладнання, функція завантаження зображень, поточні URL зображень
+  }, [equipments, fetchAndSetImage, imageUrls]);
 
-  // --- Ефект для очищення blob-URL при розмонтуванні компонента ---
   useEffect(() => {
     return () => {
-      blobUrlsRef.current.forEach(url => {
+      blobUrlsRef.current.forEach((url) => {
         URL.revokeObjectURL(url);
         console.log("Revoked blob URL:", url);
       });
       blobUrlsRef.current.clear();
     };
-  }, []); // Порожній масив залежностей — запускається лише при монтуванні/розмонтуванні
+  }, []);
 
-  // --- Обробники для пагінації ---
   const handlePreviousPage = () => {
-    // Не потрібно перевіряти isLoadingList тут, кнопка вже буде disabled
-    setCurrentPage(prevPage => Math.max(0, prevPage - 1));
+    setCurrentPage((prevPage) => Math.max(0, prevPage - 1));
   };
 
   const handleNextPage = () => {
-    // Не потрібно перевіряти isLoadingList тут, кнопка вже буде disabled
-    setCurrentPage(prevPage => Math.min(totalPages - 1, prevPage + 1));
+    setCurrentPage((prevPage) => Math.min(totalPages - 1, prevPage + 1));
   };
 
   const handlePageSizeChange = (event) => {
     const newSize = Number(event.target.value);
     setPageSize(newSize);
-    setCurrentPage(0); // Скидаємо на першу сторінку при зміні розміру
+    setCurrentPage(0);
   };
 
   return (
     <div className="equipments-page">
       <h2>Енергетичне обладнання</h2>
+
+      <div className="filter-section"> {/* Додано клас filter-section */}
+        {/* Пошук за ключовим словом та кнопка "Пошук" */}
+        <div className="main-search">
+          <input
+            type="text"
+            name="keyword"
+            placeholder="Ключове слово"
+            value={filters.keyword}
+            onChange={handleFilterChange}
+            className="filter-control" // Додано клас filter-control
+          />
+          <button onClick={handleSearch}>Пошук</button>
+        </div>
+
+        {/* Кнопка для розгортання/згортання додаткових фільтрів */}
+        <button
+          onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+          className="toggle-filters-button" // Додано клас
+        >
+          {showAdvancedFilters ? "Згорнути фільтри" : "Розгорнути фільтри"}
+        </button>
+
+        {/* Додаткові фільтри (розгортаються/згортаються) */}
+        {showAdvancedFilters && (
+          <div className="advanced-filters">
+            <select
+              name="category"
+              value={filters.category}
+              onChange={handleFilterChange}
+              className="filter-control" // Додано клас filter-control
+            >
+              <option value="">Всі категорії</option>
+              {Object.keys(categoriesData).map((key) => (
+                <option key={key} value={key}>
+                  {categoryTranslations[key] || key}
+                </option>
+              ))}
+            </select>
+
+            {filters.category && (
+              <select
+                name="subcategory"
+                value={filters.subcategory}
+                onChange={handleFilterChange}
+                className="filter-control" // Додано клас filter-control
+              >
+                <option value="">Всі підкатегорії</option>
+                {categoriesData[filters.category]?.map((sub) => (
+                  <option key={sub} value={sub}>
+                    {subcategoryTranslations[sub] || sub}
+                  </option>
+                ))}
+              </select>
+            )}
+
+            <select
+              name="condition"
+              value={filters.condition}
+              onChange={handleFilterChange}
+              className="filter-control" // Додано клас filter-control
+            >
+              <option value="">Всі стани</option>
+              <option value="NEW">Новий</option>
+              <option value="USED">Вживаний</option>
+              <option value="REFURBISHED">Відновлений</option>
+            </select>
+
+            <div className="filter-group price-filters"> {/* Додано клас filter-group та price-filters */}
+              <input
+                type="number"
+                name="minPrice"
+                placeholder="Мін. ціна"
+                value={filters.minPrice}
+                onChange={handleFilterChange}
+                className="filter-control" // Додано клас filter-control
+              />
+              <input
+                type="number"
+                name="maxPrice"
+                placeholder="Макс. ціна"
+                value={filters.maxPrice}
+                onChange={handleFilterChange}
+                className="filter-control" // Додано клас filter-control
+              />
+            </div>
+          </div>
+        )}
+      </div> {/* Закриття filter-section */}
 
       {isLoadingList && <div className="loading">Завантаження списку...</div>}
       {error && !isLoadingList && <p className="error">{error}</p>}
@@ -144,7 +258,6 @@ const EquipmentsPage = () => {
         <div className="equipment-list">
           {equipments.map((item) => {
             const imageUrl = imageUrls[item.id];
-            // Стан завантаження для конкретного зображення (якщо є ID, але URL ще не встановлено)
             const isImageLoading = item.mainImageId && imageUrl === undefined;
 
             return (
@@ -154,25 +267,23 @@ const EquipmentsPage = () => {
                   <img
                     src={imageUrl}
                     alt={item.equipmentName}
-                    // width і height видалені, керування розміром через CSS
                     onError={(e) => {
                       console.warn(`Failed to load image resource: ${imageUrl}`);
-                      // Замість display: none можна показати плейсхолдер або текст помилки
-                      setImageUrls(prev => ({ ...prev, [item.id]: null })); // Позначити як помилку
+                      setImageUrls((prev) => ({ ...prev, [item.id]: null }));
                     }}
                   />
                 ) : (
-                  // Використовуємо клас замість інлайн стилів
                   <div className="image-placeholder">
                     {!item.mainImageId
-                      ? 'Немає фото'
-                      : (isFetchingImages || isImageLoading) // Показуємо завантаження, якщо глобально завантажуються зображення або конкретне це
-                        ? 'Завантаження фото...'
-                        : 'Фото недоступне' // Якщо URL = null або інша помилка
-                    }
+                      ? "Немає фото"
+                      : isFetchingImages || isImageLoading
+                        ? "Завантаження фото..."
+                        : "Фото недоступне"}
                   </div>
                 )}
-                <p><strong>Ціна за день:</strong> {item.pricePerDay} грн</p>
+                <p>
+                  <strong>Ціна за день:</strong> {item.pricePerDay} грн
+                </p>
                 <Link to={`/equipment/${item.id}`}>Детальніше</Link>
               </div>
             );
@@ -180,35 +291,35 @@ const EquipmentsPage = () => {
         </div>
       )}
 
-      {/* Елементи керування пагінацією */}
       {!isLoadingList && totalPages > 1 && (
         <div className="pagination-controls">
           <button
             onClick={handlePreviousPage}
-            disabled={currentPage === 0 || isLoadingList} // Disable під час завантаження списку
+            disabled={currentPage === 0 || isLoadingList}
           >
             Попередня
           </button>
-          <span>Сторінка {currentPage + 1} з {totalPages}</span>
+          <span>
+            Сторінка {currentPage + 1} з {totalPages}
+          </span>
           <button
             onClick={handleNextPage}
-            disabled={currentPage >= totalPages - 1 || isLoadingList} // Disable під час завантаження списку
+            disabled={currentPage >= totalPages - 1 || isLoadingList}
           >
             Наступна
           </button>
-          {/* Додано label та контейнер для кращого вигляду */}
           <div className="page-size-selector">
-             <label htmlFor="pageSizeSelect">Елементів на сторінці:</label>
-             <select
-                id="pageSizeSelect"
-                value={pageSize}
-                onChange={handlePageSizeChange}
-                disabled={isLoadingList} // Disable під час завантаження списку
-             >
-                <option value={5}>5</option>
-                <option value={10}>10</option>
-                <option value={25}>25</option>
-             </select>
+            <label htmlFor="pageSizeSelect">Елементів на сторінці:</label>
+            <select
+              id="pageSizeSelect"
+              value={pageSize}
+              onChange={handlePageSizeChange}
+              disabled={isLoadingList}
+            >
+              <option value={5}>5</option>
+              <option value={10}>10</option>
+              <option value={25}>25</option>
+            </select>
           </div>
         </div>
       )}

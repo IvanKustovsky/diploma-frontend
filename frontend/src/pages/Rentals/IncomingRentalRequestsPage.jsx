@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import {
-    fetchMyOutgoingRentals,
+    fetchMyIncomingRentals,
     fetchEquipmentById,
     fetchImageById,
-    cancelRentalRequest,
     downloadRentalPdf
 } from "../../services/api";
 import "../../assets/EquipmentsPage.css";
@@ -24,7 +24,7 @@ const IncomingRentalRequestsPage = () => {
         setLoading(true);
         setError(null);
         try {
-            const pageData = await fetchMyOutgoingRentals(currentPage, pageSize);
+            const pageData = await fetchMyIncomingRentals(currentPage, pageSize);
             setRequests(pageData.content || []);
             setTotalPages(pageData.totalPages || 0);
             setCurrentPage(pageData.number || 0);
@@ -68,16 +68,6 @@ const IncomingRentalRequestsPage = () => {
         loadData();
     }, [currentPage, pageSize]);
 
-    const handleCancel = async (rentalId) => {
-        if (!window.confirm("Ви впевнені, що хочете скасувати цей запит?")) return;
-        try {
-            await cancelRentalRequest(rentalId);
-            await loadData();
-        } catch (err) {
-            alert(err.message);
-        }
-    };
-
     const handlePreviousPage = () => setCurrentPage(prev => Math.max(0, prev - 1));
     const handleNextPage = () => setCurrentPage(prev => Math.min(totalPages - 1, prev + 1));
     const handlePageSizeChange = (e) => {
@@ -87,7 +77,7 @@ const IncomingRentalRequestsPage = () => {
 
     const handleDownloadPdf = async (rentalId) => {
         try {
-            await downloadRentalPdf(rentalId);  // Викликаємо метод для завантаження PDF
+            await downloadRentalPdf(rentalId);
         } catch (err) {
             alert("Не вдалося завантажити PDF документ.");
         }
@@ -95,7 +85,7 @@ const IncomingRentalRequestsPage = () => {
 
     return (
         <div className="equipments-page">
-            <h2>Мої запити на оренду</h2>
+            <h2>Запити на мої оголошення</h2>
 
             {loading && <div className="loading">Завантаження...</div>}
             {error && <p className="error">{error}</p>}
@@ -133,9 +123,9 @@ const IncomingRentalRequestsPage = () => {
                                     )}</p>
 
                                 {request.status === "PENDING" && (
-                                    <button onClick={() => handleCancel(request.id)}>
-                                        Скасувати запит
-                                    </button>
+                                    <div className="request-actions">
+                                        <Link to={`/incoming-rental-requests/${request.id}`} className="details-btn">Детальніше</Link>
+                                    </div>
                                 )}
 
                                 {/* Кнопка для завантаження PDF */}

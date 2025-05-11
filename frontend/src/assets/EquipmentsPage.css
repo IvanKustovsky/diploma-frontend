@@ -217,6 +217,94 @@
   transform: translateY(0);
 }
 
+/* Стилі для контейнера фільтрів */
+.filter-section {
+  margin-bottom: 20px;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+}
+
+/* Стилі для основного пошуку */
+.main-search {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.main-search input[type="text"] {
+  flex: 10;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.main-search button {
+  flex: 1;
+  padding: 10px;
+  margin: 10px;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.main-search button:hover {
+  background-color: #0056b3;
+}
+
+/* Стилі для кнопки розгортання/згортання фільтрів */
+.toggle-filters-button {
+  display: block;
+  margin-bottom: 15px;
+  padding: 8px 15px;
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.toggle-filters-button:hover {
+  background-color: #5a6268;
+}
+
+/* Стилі для контейнера додаткових фільтрів */
+.advanced-filters {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 15px;
+  padding-top: 15px;
+  border-top: 1px solid #eee;
+}
+
+/* Стилі для загальних елементів управління фільтрами (input, select) */
+.filter-control {
+  width: 100%;
+  padding: 10px;
+  margin: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  font-size: 1rem;
+}
+
+/* Стилі для групи фільтрів (наприклад, ціни) */
+.filter-group {
+  display: flex;
+  gap: 10px;
+}
+
+/* Стилі для інпутів в групі (щоб вони ділили простір) */
+.filter-group .filter-control {
+  flex: 1;
+  margin: 10px;
+}
+
+
 /* Стилі для пагінації */
 .pagination-controls {
   display: flex;

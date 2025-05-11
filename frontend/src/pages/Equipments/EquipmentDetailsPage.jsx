@@ -114,7 +114,9 @@ const EquipmentDetailsPage = () => {
         </Link>
       )}
 
-      <Link className="back-link" to="/equipments">⬅️ Назад до списку</Link>
+      <Link className="back-link"
+        to={currentUserId === equipment.userId ? "/my-equipments" : "/equipments"}
+      > ⬅️ Назад до списку</Link>
     </div>
   );
 };

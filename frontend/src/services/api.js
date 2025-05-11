@@ -95,7 +95,7 @@ export const registerUser = async (userData) => {
 export const fetchCurrentUserId = async () => {
   try {
     const response = await apiClient.get("/users/api/v1/getUserIdFromToken");
-    return response.data; 
+    return response.data;
   } catch (error) {
     if (error.response) {
       throw error.response;
@@ -121,16 +121,11 @@ export const logInUser = async (userData) => {
   try {
     const body = { username: userData.email, password: userData.password };
     const response = await apiClient.post("/auth/api/v1/login", body);
-    console.log("Login Response:", response.data);
     return response.data;
   } catch (error) {
-    console.error("Login Error:", error.response || error);
-    // Обробка помилок
     if (error.response) {
-      console.error("Server responded with an error:", error.response.status);
       throw error.response;
     }
-    console.error("No response from server");
     throw new Error("Щось пішло не так");
   }
 };
@@ -174,26 +169,6 @@ export const fetchPendingAdvertisements = async () => {
   }
 };
 
-export const fetchApprovedAdvertisements = async (page = 0, size = process.env.REACT_APP_PAGE_SIZE) => {
-  try {
-    const response = await apiClient.get("/advertisement/api/v1/approved", {
-      params: {
-        page: page,
-        size: size,
-      },
-    });
-    return response.data;
-  } catch (error) {
-    console.error("Помилка завантаження затверджених оголошень:", error);
-    if (error.response) {
-      // Якщо є відповідь з помилкою від сервера
-      throw error.response;
-    }
-    // Якщо сталася інша помилка (наприклад, мережева)
-    throw new Error("Не вдалося завантажити обладнання");
-  }
-};
-
 export const fetchApprovedAdvertisementsByUserId = async (userId, page = 0, size = process.env.REACT_APP_PAGE_SIZE) => {
   try {
     const response = await apiClient.get(`/advertisement/api/v1/approved/user/${userId}`, {
@@ -225,7 +200,7 @@ export const approveAdvertisement = async (id, payload) => {
 
 export const rejectAdvertisement = async (id, payload) => {
   try {
-    const response = await apiClient.put(`/advertisement/api/v1/${id}/reject`, payload); // TODO change endpoint to advertisement
+    const response = await apiClient.put(`/advertisement/api/v1/${id}/reject`, payload);
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -239,7 +214,7 @@ export const fetchMyAdvertisements = async (page = 0, size = process.env.REACT_A
   try {
     const response = await apiClient.get("/advertisement/api/v1/my", {
       params: {
-        page: page, 
+        page: page,
         size: size,
       },
     });
@@ -249,6 +224,24 @@ export const fetchMyAdvertisements = async (page = 0, size = process.env.REACT_A
       throw error.response;
     }
     throw new Error("Не вдалося завантажити обладнання");
+  }
+};
+
+export const searchAdvertisements = async (filters, page = 0, size = process.env.REACT_APP_PAGE_SIZE) => {
+  try {
+    const params = {
+      page: page,
+      size: size,
+      ...filters
+    };
+    const response = await apiClient.get("/advertisement/api/v1/approved", { params });
+    return response.data;
+  } catch (error) {
+    console.error("Помилка завантаження оголошень з фільтрами:", error);
+    if (error.response) {
+      throw error.response;
+    }
+    throw new Error("Не вдалося завантажити оголошення");
   }
 };
 
@@ -385,7 +378,7 @@ export const uploadAdditionalImages = async (id, files) => {
     if (error.response) {
       throw error.response;
     }
-    throw new Error("Помилка при завантаженні додаткових зображень для обладнання з ID ${id}:");
+    throw new Error(`Помилка при завантаженні додаткових зображень для обладнання з ID ${id}:`);
   }
 };
 
