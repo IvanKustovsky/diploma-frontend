@@ -1,5 +1,3 @@
-// src/utils/validation.js
-
 export const validateSignup = (formData, includeCompany, companyData) => {
   const errors = {};
 
@@ -65,8 +63,9 @@ export const validateEquipment = (equipment) => {
     errors.condition = "Стан обов'язковий";
   }
 
-  if (equipment.price === undefined || equipment.price === null || equipment.price < 0) {
-    errors.price = "Ціна має бути невід'ємним числом";
+  const parsedPrice = parseFloat(equipment.pricePerDay);
+  if (isNaN(parsedPrice) || parsedPrice < 0) {
+    errors.pricePerDay = "Ціна має бути невід'ємним числом";
   }
 
   return errors;
@@ -93,20 +92,17 @@ export const validateRentalForm = (formData) => {
     errors.address = "Адреса обов'язкова";
   }
 
-  // Validate start date is not before today
   if (!formData.startDate) {
     errors.startDate = "Дата початку оренди обов'язкова";
   } else if (startDate < today) {
     errors.startDate = "Дата початку оренди не може бути раніше сьогоднішньої";
   }
 
-  // Validate end date is after start date
   if (!formData.endDate) {
     errors.endDate = "Дата кінця оренди обов'язкова";
   } else if (endDate <= startDate) {
     errors.endDate = "Дата кінця оренди має бути пізніше за дату початку";
   }
-
 
   return errors;
 };

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   fetchMyAdvertisements,
   fetchImageById,
@@ -111,8 +111,8 @@ const MyEquipmentsPage = () => {
             )}
             <p><strong>Ціна за день:</strong> {item.pricePerDay} грн</p>
             <div className="actions equipment-actions">
-              <Link to={`/equipment/${item.id}`}>👁 Переглянути</Link>
-              <Link to={`/equipment/${item.id}/edit`}>✏️ Редагувати</Link>
+              <Link to={`/equipment/${item.equipmentId}`}>👁 Переглянути</Link>
+              <Link to={`/equipment/${item.equipmentId}/edit`}>✏️ Редагувати</Link>
               {(item.equipmentStatus === "AVAILABLE" || item.equipmentStatus === "INACTIVE") && (
                 <button
                   onClick={() => handleToggleStatus(item.equipmentId, item.equipmentStatus)}

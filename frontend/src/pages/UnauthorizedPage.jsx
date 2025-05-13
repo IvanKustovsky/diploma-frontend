@@ -1,5 +1,3 @@
-import React from "react";
-
 const UnauthorizedPage = () => {
   return (
     <div style={{ padding: "2rem", textAlign: "center" }}>

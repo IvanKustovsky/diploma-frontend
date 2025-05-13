@@ -1,13 +1,14 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { registerEquipment, getCategoriesWithSubcategories } from "../../services/api";
 import "../../assets/UploadEquipmentPage.css";
 import { categoryTranslations, subcategoryTranslations } from '../../data/translations';
+import { validateEquipment } from "../../utils/validation";
 
 const UploadEquipmentPage = () => {
   const navigate = useNavigate();
   const [name, setName] = useState("");
-  const [description, setDescription] = useState(null);
+  const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
   const [subcategory, setSubcategory] = useState("");
   const [categoriesData, setCategoriesData] = useState({});
@@ -15,11 +16,12 @@ const UploadEquipmentPage = () => {
   const [condition, setCondition] = useState("NEW");
   const [imageFile, setImageFile] = useState(null);
   const [error, setError] = useState(null);
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const data = await getCategoriesWithSubcategories(); 
+        const data = await getCategoriesWithSubcategories();
         setCategoriesData(data);
       } catch (err) {
         console.error("Помилка завантаження категорій:", err);
@@ -31,17 +33,6 @@ const UploadEquipmentPage = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    // Якщо зображення не завантажено — питаємо користувача
-    if (!imageFile) {
-      const proceed = window.confirm(
-        "Обладнання без головного зображення не буде доступним іншим користувачам, " +
-        "але ви можете завантажити його пізніше. Додати фото пізніше?"
-      );
-      if (!proceed) {
-        return;
-      }
-    }
-
     const equipmentDto = {
       name,
       description,
@@ -50,6 +41,20 @@ const UploadEquipmentPage = () => {
       pricePerDay: pricePerDay.trim(),
       condition,
     };
+
+    const validationErrors = validateEquipment(equipmentDto);
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+
+    if (!imageFile) {
+      const proceed = window.confirm(
+        "Обладнання без головного зображення не буде доступним іншим користувачам, " +
+        "але ви можете завантажити його пізніше. Додати фото пізніше?"
+      );
+      if (!proceed) return;
+    }
 
     try {
       await registerEquipment(equipmentDto, imageFile);
@@ -71,8 +76,8 @@ const UploadEquipmentPage = () => {
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            required
           />
+          {errors.name && <p className="error">{errors.name}</p>}
         </div>
         <div>
           <label>Опис:</label>
@@ -80,13 +85,18 @@ const UploadEquipmentPage = () => {
             value={description}
             onChange={(e) => setDescription(e.target.value)}
           />
+          {errors.description && <p className="error">{errors.description}</p>}
         </div>
         <div>
           <label>Категорія:</label>
-          <select value={category} onChange={(e) => {
-            setCategory(e.target.value);
-            setSubcategory(""); // скидаємо підкатегорію при зміні категорії
-          }} required>
+          <select
+            value={category}
+            onChange={(e) => {
+              const selectedCategory = e.target.value;
+              setCategory(selectedCategory);
+              setSubcategory(selectedCategory === "OTHER" ? "OTHER" : "");
+            }}
+          >
             <option value="">Оберіть категорію</option>
             {Object.keys(categoriesData).map((key) => (
               <option key={key} value={key}>
@@ -94,12 +104,17 @@ const UploadEquipmentPage = () => {
               </option>
             ))}
           </select>
+          {errors.category && <p className="error">{errors.category}</p>}
         </div>
 
-        {category && (
+        {category && category !== "OTHER" && (
           <div>
             <label>Підкатегорія:</label>
-            <select value={subcategory} onChange={(e) => setSubcategory(e.target.value)} required>
+            <select
+              value={subcategory}
+              onChange={(e) => setSubcategory(e.target.value)}
+              disabled={category === "OTHER"}
+            >
               <option value="">Оберіть підкатегорію</option>
               {categoriesData[category]?.map((sub) => (
                 <option key={sub} value={sub}>
@@ -107,6 +122,7 @@ const UploadEquipmentPage = () => {
                 </option>
               ))}
             </select>
+            {errors.subcategory && <p className="error">{errors.subcategory}</p>}
           </div>
         )}
         <div>
@@ -115,20 +131,20 @@ const UploadEquipmentPage = () => {
             type="number"
             value={pricePerDay}
             onChange={(e) => setPricePerDay(e.target.value)}
-            required
           />
+          {errors.pricePerDay && <p className="error">{errors.pricePerDay}</p>}
         </div>
         <div>
           <label>Стан:</label>
           <select
             value={condition}
             onChange={(e) => setCondition(e.target.value)}
-            required
           >
             <option value="NEW">Новий</option>
             <option value="USED">Вживаний</option>
             <option value="REFURBISHED">Відновлений</option>
           </select>
+          {errors.condition && <p className="error">{errors.condition}</p>}
         </div>
         <div>
           <label>Зображення (необов'язкове):</label>

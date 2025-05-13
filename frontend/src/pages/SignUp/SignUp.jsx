@@ -1,5 +1,4 @@
-// SignUp.js
-import React, { useState } from "react";
+import { useState } from "react";
 import { registerUser } from "../../services/api";
 import useForm from "../../hooks/useForm";
 import { validateSignup } from "../../utils/validation";
@@ -35,22 +34,21 @@ const SignUp = () => {
       setSuccess(false);
       setValidationErrors({});
 
-      // Додаємо +380 до номера телефону перед відправкою
       const mobileNumberWithPrefix = `+380${formData.mobileNumber}`;
 
-      const bodyData = includeCompany 
-        ? { ...formData, mobileNumber: mobileNumberWithPrefix, company: companyData } 
+      const bodyData = includeCompany
+        ? { ...formData, mobileNumber: mobileNumberWithPrefix, company: companyData }
         : { ...formData, mobileNumber: mobileNumberWithPrefix };
-        await registerUser(bodyData);
-        setSuccess(true);
-      } catch (err) {
-        if (err.status === 503 || err.status === 500) {
-          setError("Сервіс тимчасово недоступний. Спробуйте ще раз пізніше.");
-        } else {
-          setError(err.data?.errorMessage || "Щось пішло не так");
-        }
-        setSuccess(false);
+      await registerUser(bodyData);
+      setSuccess(true);
+    } catch (err) {
+      if (err.status === 503 || err.status === 500) {
+        setError("Сервіс тимчасово недоступний. Спробуйте ще раз пізніше.");
+      } else {
+        setError(err.data?.errorMessage || "Щось пішло не так");
       }
+      setSuccess(false);
+    }
   };
 
   const handleCompanyChange = (e) => {

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import {
   fetchEquipmentById,
@@ -12,7 +12,7 @@ import "../../assets/EquipmentDetailsPage.css";
 import "../../assets/AdvertisementModerationPage.css";
 
 const IncomingRentalRequestDetails = () => {
-  const { id } = useParams(); // rentalId
+  const { id } = useParams();
   const navigate = useNavigate();
   const [rental, setRental] = useState(null);
   const [equipment, setEquipment] = useState(null);
@@ -25,7 +25,6 @@ const IncomingRentalRequestDetails = () => {
   useEffect(() => {
     const loadRentalRequest = async () => {
       try {
-        // Очікується, що у вас є метод отримання rental по id
         const rentalData = await fetchRentalById(id);
         console.log("Rental data" , rentalData)
         setRental(rentalData);

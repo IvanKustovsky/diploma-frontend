@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
     fetchMyIncomingRentals,
@@ -128,7 +128,6 @@ const IncomingRentalRequestsPage = () => {
                                     </div>
                                 )}
 
-                                {/* Кнопка для завантаження PDF */}
                                 <button onClick={() => handleDownloadPdf(request.id)}>
                                     Завантажити договір
                                 </button>

@@ -7,7 +7,7 @@ const apiClient = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
-  withCredentials: true, // обов'язково, щоб надсилати cookie з refresh токеном
+  withCredentials: true,
 });
 
 // ✅ Додаємо access_token до кожного запиту, що не є open-api
@@ -46,7 +46,6 @@ apiClient.interceptors.request.use((config) => {
 apiClient.interceptors.response.use(
   (response) => response,
   async (error) => {
-    // Детальне логування помилки
     console.log("📛 Interceptor error details:", {
       hasResponse: !!error.response,
       status: error.response?.status,
@@ -60,15 +59,14 @@ apiClient.interceptors.response.use(
     if ((status === 401) && !isLoginRequest && !originalRequest.retry) { // щоб уникнути зациклення
       originalRequest._retry = true;
       try {
-        const response = await refreshToken(); // Отримуємо новий access_token
+        const response = await refreshToken();
         const newToken = response.access_token;
 
-        setAccessToken(newToken); // Зберігаємо в localStorage
-        originalRequest.headers.Authorization = `Bearer ${newToken}`; // Оновлюємо заголовок
+        setAccessToken(newToken);
+        originalRequest.headers.Authorization = `Bearer ${newToken}`;
 
-        return apiClient(originalRequest); // Повторюємо запит
+        return apiClient(originalRequest); // Повторюємо оригінальний запит
       } catch (refreshError) {
-        // Якщо refresh не вдався — редирект або очищення токена
         clearAccessToken();
         return Promise.reject(refreshError);
       }
@@ -82,13 +80,12 @@ export default apiClient;
 export const registerUser = async (userData) => {
   try {
     const response = await apiClient.post("/users/api/v1/register", userData);
-    return response.data; // Успішна відповідь
+    return response.data;
   } catch (error) {
-    // Передаємо всю інформацію про помилки
     if (error.response) {
-      throw error.response; // Кидаємо всю відповідь з сервера
+      throw error.response;
     }
-    throw new Error("Щось пішло не так"); // Загальна помилка
+    throw new Error("Щось пішло не так"); 
   }
 };
 
@@ -107,13 +104,12 @@ export const fetchCurrentUserId = async () => {
 export const fetchUserInfoById = async (id) => {
   try {
     const response = await apiClient.get(`/users/api/v1/${id}`, id);
-    return response.data; // Успішна відповідь
+    return response.data;
   } catch (error) {
-    // Передаємо всю інформацію про помилки
     if (error.response) {
-      throw error.response; // Кидаємо всю відповідь з сервера
+      throw error.response;
     }
-    throw new Error("Щось пішло не так"); // Загальна помилка
+    throw new Error("Щось пішло не так");
   }
 };
 
@@ -133,12 +129,9 @@ export const logInUser = async (userData) => {
 export const logOutUser = async () => {
   try {
     const response = await apiClient.post("/auth/api/v1/logout");
-    console.log("Logout successful:", response.status);
     return response.status;
   } catch (error) {
-    console.error("Logout Error:", error.response || error);
     if (error.response) {
-      console.error("Server responded with an error:", error.response.status);
       throw error.response;
     }
     throw new Error("Помилка при виході з системи");
@@ -148,7 +141,7 @@ export const logOutUser = async () => {
 export const refreshToken = async () => {
   try {
     const response = await apiClient.post("/auth/api/v1/refresh", null);
-    return response.data; // Новий access_token у відповіді
+    return response.data;
   } catch (error) {
     if (error.response) {
       throw error.response;
@@ -247,7 +240,7 @@ export const searchAdvertisements = async (filters, page = 0, size = process.env
 
 export const activateEquipment = async (id) => {
   try {
-    const response = await apiClient.put(`/equipments/api/v1/${id}/activate`); // TODO Change to patch probably
+    const response = await apiClient.put(`/equipments/api/v1/${id}/activate`);
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -259,7 +252,7 @@ export const activateEquipment = async (id) => {
 
 export const deactivateEquipment = async (id) => {
   try {
-    const response = await apiClient.put(`/equipments/api/v1/${id}/deactivate`);  // TODO Change to patch probably
+    const response = await apiClient.put(`/equipments/api/v1/${id}/deactivate`);
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -456,13 +449,9 @@ export const fetchMyIncomingRentals = async (page = 0, size = process.env.REACT_
  */
 export const approveRentalRequest = async (rentalId) => {
   try {
-    // Використовуємо PUT запит відповідно до вашого контролера
     const response = await apiClient.put(`/rentals/api/v1/${rentalId}/approve`);
-    console.log("Approve response:", response.data);
-    return response.data; // Повертаємо відповідь сервера
+    return response.data;
   } catch (error) {
-    console.error(`Failed to approve rental request ${rentalId}:`, error.response || error);
-    // Перекидаємо помилку далі, щоб компонент міг її обробити
     throw new Error(error.response?.data?.errorMessage || "Не вдалося затвердити запит");
   }
 };
@@ -475,15 +464,10 @@ export const approveRentalRequest = async (rentalId) => {
  */
 export const rejectRentalRequest = async (rentalId, rejectionMessage) => {
   try {
-    // Створюємо тіло запиту відповідно до RejectRentalRequestDto
     const requestBody = { rejectionMessage };
-    // Використовуємо PUT запит відповідно до вашого контролера
     const response = await apiClient.put(`/rentals/api/v1/${rentalId}/reject`, requestBody);
-    console.log("Reject response:", response.data);
-    return response.data; // Повертаємо відповідь сервера
+    return response.data;
   } catch (error) {
-    console.error(`Failed to reject rental request ${rentalId}:`, error.response || error);
-    // Перекидаємо помилку далі, щоб компонент міг її обробити
     throw new Error(error.response?.data?.errorMessage || "Не вдалося відхилити запит");
   }
 };
@@ -496,10 +480,8 @@ export const rejectRentalRequest = async (rentalId, rejectionMessage) => {
 export const cancelRentalRequest = async (rentalId) => {
   try {
     const response = await apiClient.put(`/rentals/api/v1/${rentalId}/cancel`);
-    console.log("Cancel response:", response.data);
     return response.data;
   } catch (error) {
-    console.error(`Failed to cancel rental request ${rentalId}:`, error.response || error);
     throw new Error(error.response?.data?.errorMessage || "Не вдалося скасувати запит");
   }
 };
@@ -511,29 +493,21 @@ export const cancelRentalRequest = async (rentalId) => {
  */
 export const downloadRentalPdf = async (rentalId) => {
   try {
-    // Замість apiClient, використовуйте ваш клієнт для запитів
     const response = await apiClient.get(`/rentals/api/v1/${rentalId}/pdf`, {
       responseType: 'arraybuffer',  // Важливо, щоб PDF був отриманий у вигляді бінарних даних
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('access_token')}`  // передайте токен авторизації, якщо необхідно
-      }
     });
 
-    // Створити об'єкт Blob з отриманих даних
     const pdfBlob = new Blob([response.data], { type: 'application/pdf' });
 
-    // Створити URL для Blob
     const pdfUrl = window.URL.createObjectURL(pdfBlob);
 
-    // Створити тимчасове посилання для завантаження
     const link = document.createElement('a');
     link.href = pdfUrl;
-    link.download = `rental_${rentalId}.pdf`;  // Назва файлу
+    link.download = `rental_${rentalId}.pdf`;
     document.body.appendChild(link);
-    link.click();  // Клік по лінку для завантаження
-    document.body.removeChild(link);  // Видалити тимчасове посилання
+    link.click(); 
+    document.body.removeChild(link);
   } catch (error) {
-    console.error("Помилка при завантаженні PDF:", error);
     alert("Не вдалося завантажити PDF документ для цього оренду.");
   }
 };

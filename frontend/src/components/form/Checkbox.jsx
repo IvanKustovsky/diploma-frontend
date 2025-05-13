@@ -1,5 +1,3 @@
-import React from "react";
-
 const Checkbox = ({ label, checked, onChange }) => {
   return (
     <div className="checkbox-field mb-4">

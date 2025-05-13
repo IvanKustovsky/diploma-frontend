@@ -1,13 +1,9 @@
-import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
-// Layout
 import Layout from "./components/ui/Layout";
 
-// Auth Context
 import { AuthProvider } from "./context/AuthContext";
 
-// Pages
 import HomePage from "./pages/Home/HomePage";
 import SignUp from "./pages/SignUp/SignUp";
 import LogIn from "./pages/Login/LogIn";
@@ -26,7 +22,6 @@ import IncomingRentalRequestsPage from "./pages/Rentals/IncomingRentalRequestsPa
 import OutgoingRentalRequestsPage from "./pages/Rentals/OutgoingRentalRequestsPage";
 import IncomingRentalRequestDetails from "./pages/Rentals/IncomingRentalRequestDetails";
 
-// Protected Route
 import ProtectedRoute from "./components/ui/ProtectedRoute";
 
 function App() {

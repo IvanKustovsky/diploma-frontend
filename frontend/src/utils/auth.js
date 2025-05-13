@@ -1,4 +1,3 @@
-// utils/auth.js
 const ACCESS_TOKEN_KEY = "access_token";
 
 export const setAccessToken = (token) => {

@@ -5,7 +5,7 @@ import "../../assets/EquipmentsPage.css";
 import { categoryTranslations, subcategoryTranslations } from '../../data/translations';
 
 const EquipmentsPage = () => {
-  const DEFAULT_PAGE_SIZE = parseInt(process.env.REACT_APP_PAGE_SIZE || "2", 10);
+  const DEFAULT_PAGE_SIZE = parseInt(process.env.REACT_APP_PAGE_SIZE || "5", 10);
   const [equipments, setEquipments] = useState([]);
   const [imageUrls, setImageUrls] = useState({});
   const [error, setError] = useState(null);
@@ -156,8 +156,7 @@ const EquipmentsPage = () => {
     <div className="equipments-page">
       <h2>Енергетичне обладнання</h2>
 
-      <div className="filter-section"> {/* Додано клас filter-section */}
-        {/* Пошук за ключовим словом та кнопка "Пошук" */}
+      <div className="filter-section">
         <div className="main-search">
           <input
             type="text"
@@ -165,27 +164,24 @@ const EquipmentsPage = () => {
             placeholder="Ключове слово"
             value={filters.keyword}
             onChange={handleFilterChange}
-            className="filter-control" // Додано клас filter-control
+            className="filter-control"
           />
           <button onClick={handleSearch}>Пошук</button>
         </div>
 
-        {/* Кнопка для розгортання/згортання додаткових фільтрів */}
         <button
           onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
-          className="toggle-filters-button" // Додано клас
+          className="toggle-filters-button"
         >
           {showAdvancedFilters ? "Згорнути фільтри" : "Розгорнути фільтри"}
         </button>
-
-        {/* Додаткові фільтри (розгортаються/згортаються) */}
         {showAdvancedFilters && (
           <div className="advanced-filters">
             <select
               name="category"
               value={filters.category}
               onChange={handleFilterChange}
-              className="filter-control" // Додано клас filter-control
+              className="filter-control"
             >
               <option value="">Всі категорії</option>
               {Object.keys(categoriesData).map((key) => (
@@ -200,7 +196,7 @@ const EquipmentsPage = () => {
                 name="subcategory"
                 value={filters.subcategory}
                 onChange={handleFilterChange}
-                className="filter-control" // Додано клас filter-control
+                className="filter-control"
               >
                 <option value="">Всі підкатегорії</option>
                 {categoriesData[filters.category]?.map((sub) => (
@@ -215,7 +211,7 @@ const EquipmentsPage = () => {
               name="condition"
               value={filters.condition}
               onChange={handleFilterChange}
-              className="filter-control" // Додано клас filter-control
+              className="filter-control"
             >
               <option value="">Всі стани</option>
               <option value="NEW">Новий</option>
@@ -223,14 +219,14 @@ const EquipmentsPage = () => {
               <option value="REFURBISHED">Відновлений</option>
             </select>
 
-            <div className="filter-group price-filters"> {/* Додано клас filter-group та price-filters */}
+            <div className="filter-group price-filters">
               <input
                 type="number"
                 name="minPrice"
                 placeholder="Мін. ціна"
                 value={filters.minPrice}
                 onChange={handleFilterChange}
-                className="filter-control" // Додано клас filter-control
+                className="filter-control"
               />
               <input
                 type="number"
@@ -238,12 +234,12 @@ const EquipmentsPage = () => {
                 placeholder="Макс. ціна"
                 value={filters.maxPrice}
                 onChange={handleFilterChange}
-                className="filter-control" // Додано клас filter-control
+                className="filter-control"
               />
             </div>
           </div>
         )}
-      </div> {/* Закриття filter-section */}
+      </div>
 
       {isLoadingList && <div className="loading">Завантаження списку...</div>}
       {error && !isLoadingList && <p className="error">{error}</p>}

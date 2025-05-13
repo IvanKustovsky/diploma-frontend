@@ -49,7 +49,7 @@ const RentFormPage = () => {
             const start = new Date(startDate);
             const end = new Date(endDate);
             const diffTime = end.getTime() - start.getTime();
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // +1 день включно
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
             const calculatedPrice = diffDays > 0 ? diffDays * equipment.pricePerDay : 0;
             setTotalPrice(calculatedPrice);
         } else {
@@ -140,7 +140,7 @@ const RentFormPage = () => {
 
             {isSuccess ? (
                 <div className="success-message" ref={messageRef}>
-                    <p>Оренду успішно створено!</p>
+                    <p>Запит на оренду успішно створено!</p>
                     <p>Власника обладнання повідомлено. Будь ласка, очікуйте на його підтвердження.</p>
                     <button onClick={handleGoBackToEquipments}>Повернутись до пошуку обладнання</button>
                 </div>

@@ -1,5 +1,3 @@
-import React from "react";
-
 const CompanyCodeInput = ({ value, onChange, error }) => {
   return (
     <div className="input-field mb-4">

@@ -1,5 +1,3 @@
-import React from "react";
-
 const PhoneInput = ({ value, onChange, error }) => {
   return (
     <div className="phone-input-container">
