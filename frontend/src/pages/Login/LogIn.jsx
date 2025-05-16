@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { logInUser } from "../../services/api";
 import useForm from "../../hooks/useForm";
 import { InputField, SubmitButton } from "../../components/form";
@@ -9,8 +9,6 @@ import { validateLogin } from "../../utils/validation";
 
 const LogIn = () => {
   const navigate = useNavigate();
-  const location = useLocation();
-  const from = location.state?.from?.pathname || "/";
 
   const [formData, handleChange] = useForm({
     email: "",
@@ -42,8 +40,8 @@ const LogIn = () => {
       if (response.access_token) {
         await logIn(response.access_token);
         setSuccess(true);
-        console.log(from)
-        navigate(from, { replace: true });
+        console.log("Navigating to /equipments")
+        navigate("/equipments", { replace: true });
       } else {
         setError("Щось пішло не так");
       }
